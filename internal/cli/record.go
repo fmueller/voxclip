@@ -25,6 +25,8 @@ func newRecordCmd(app *appState) *cobra.Command {
 		Use:   "record",
 		Short: "Record audio into a WAV file",
 		RunE: func(cmd *cobra.Command, _ []string) error {
+			opts.input = app.input
+			opts.format = app.inputFormat
 			path, err := app.recordAudio(cmd.Context(), *opts)
 			if err != nil {
 				return err
@@ -36,8 +38,6 @@ func newRecordCmd(app *appState) *cobra.Command {
 
 	cmd.Flags().DurationVar(&opts.duration, "duration", 0, "Record duration, e.g. 6s; 0 means interactive start/stop")
 	cmd.Flags().StringVar(&opts.output, "output", "", "Output WAV file path")
-	cmd.Flags().StringVar(&opts.input, "input", "", "Input device selector for backend-specific usage")
-	cmd.Flags().StringVar(&opts.format, "input-format", "", "Input format for ffmpeg backend (pulse|alsa)")
 
 	return cmd
 }
