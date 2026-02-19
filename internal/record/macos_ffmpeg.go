@@ -1,0 +1,64 @@
+package record
+
+import (
+	"context"
+	"fmt"
+	"os"
+	"os/exec"
+	"strconv"
+	"time"
+)
+
+type ffmpegMacBackend struct{}
+
+func newFFMPEGMacOSBackend() Backend {
+	return &ffmpegMacBackend{}
+}
+
+func (b *ffmpegMacBackend) Name() string {
+	return "ffmpeg"
+}
+
+func (b *ffmpegMacBackend) Available() bool {
+	return commandAvailable("ffmpeg")
+}
+
+func (b *ffmpegMacBackend) Record(ctx context.Context, cfg Config) error {
+	if cfg.OutputPath == "" {
+		return fmt.Errorf("output path is required")
+	}
+
+	if err := os.MkdirAll(filepathDir(cfg.OutputPath), 0o755); err != nil {
+		return err
+	}
+
+	input := cfg.Input
+	if input == "" {
+		input = ":0"
+	}
+
+	args := []string{"-nostdin", "-hide_banner", "-loglevel", "error", "-y", "-f", "avfoundation", "-i", input}
+	if cfg.Duration > 0 {
+		args = append(args, "-t", strconv.Itoa(int(cfg.Duration/time.Second)))
+	}
+	args = append(args,
+		"-ac", strconv.Itoa(defaultChannels(cfg.Channels)),
+		"-ar", strconv.Itoa(defaultSampleRate(cfg.SampleRate)),
+		"-c:a", "pcm_s16le",
+		cfg.OutputPath,
+	)
+
+	cmd := exec.CommandContext(ctx, "ffmpeg", args...)
+	cmd.Stdout = os.Stderr
+	cmd.Stderr = os.Stderr
+
+	if cfg.Interactive {
+		return runInteractiveCommand(ctx, cmd, cfg.Logger)
+	}
+
+	return cmd.Run()
+}
+
+func (b *ffmpegMacBackend) ListDevices(ctx context.Context) (string, error) {
+	return commandOutput(ctx, "ffmpeg", "-hide_banner", "-f", "avfoundation", "-list_devices", "true", "-i", "")
+}
