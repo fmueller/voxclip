@@ -14,12 +14,15 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+func noopPreflight(_ context.Context) error { return nil }
+
 func TestRunDefaultFlowSuccess(t *testing.T) {
 	var order []string
 	out := new(bytes.Buffer)
 
 	app := &appState{
-		out: out,
+		out:         out,
+		preflightFn: noopPreflight,
 		recordFn: func(_ context.Context, _ recordOptions) (string, error) {
 			order = append(order, "record")
 			return "/tmp/voxclip-audio.wav", nil
@@ -49,7 +52,8 @@ func TestRunDefaultClipboardFailureIsNonFatal(t *testing.T) {
 	out := new(bytes.Buffer)
 
 	app := &appState{
-		out: out,
+		out:         out,
+		preflightFn: noopPreflight,
 		recordFn: func(_ context.Context, _ recordOptions) (string, error) {
 			order = append(order, "record")
 			return "/tmp/voxclip-audio.wav", nil
@@ -79,7 +83,8 @@ func TestRunDefaultSkipsCopyForBlankTranscript(t *testing.T) {
 	out := new(bytes.Buffer)
 
 	app := &appState{
-		out: out,
+		out:         out,
+		preflightFn: noopPreflight,
 		recordFn: func(_ context.Context, _ recordOptions) (string, error) {
 			order = append(order, "record")
 			return "/tmp/voxclip-audio.wav", nil
@@ -108,8 +113,9 @@ func TestRunDefaultCopiesBlankWhenCopyEmptyEnabled(t *testing.T) {
 	out := new(bytes.Buffer)
 
 	app := &appState{
-		out:       out,
-		copyEmpty: true,
+		out:         out,
+		copyEmpty:   true,
+		preflightFn: noopPreflight,
 		recordFn: func(_ context.Context, _ recordOptions) (string, error) {
 			order = append(order, "record")
 			return "/tmp/voxclip-audio.wav", nil
@@ -146,6 +152,7 @@ func TestRunDefaultSkipsTranscribeWhenRecordingIsSilent(t *testing.T) {
 		out:         out,
 		silenceGate: true,
 		silenceDBFS: -65,
+		preflightFn: noopPreflight,
 		recordFn: func(_ context.Context, _ recordOptions) (string, error) {
 			return path, nil
 		},
@@ -164,6 +171,29 @@ func TestRunDefaultSkipsTranscribeWhenRecordingIsSilent(t *testing.T) {
 	require.Equal(t, 0, transcribeCalls)
 	require.Equal(t, 0, copyCalls)
 	require.Equal(t, "[BLANK_AUDIO]\n", out.String())
+}
+
+func TestRunDefaultPreflightErrorAbortsBeforeRecording(t *testing.T) {
+	recorded := false
+	app := &appState{
+		model:        "nonexistent-model",
+		modelDir:     t.TempDir(),
+		autoDownload: false,
+		recordFn: func(_ context.Context, _ recordOptions) (string, error) {
+			recorded = true
+			return "/tmp/audio.wav", nil
+		},
+		transcribeFn: func(_ context.Context, _ string) (string, error) {
+			return "hello", nil
+		},
+		copyFn: func(_ context.Context, _ string) error {
+			return nil
+		},
+	}
+
+	err := app.runDefault(context.Background())
+	require.Error(t, err)
+	require.False(t, recorded, "recording should not happen when preflight fails")
 }
 
 func makePCM16WAVForIntegration(samples []int16, sampleRate int, channels int) []byte {

@@ -15,6 +15,7 @@ import (
 	"github.com/fmueller/voxclip/internal/logging"
 	"github.com/fmueller/voxclip/internal/platform"
 	"github.com/fmueller/voxclip/internal/version"
+	"github.com/fmueller/voxclip/internal/whisper"
 	"go.uber.org/zap"
 	"golang.org/x/term"
 
@@ -40,6 +41,7 @@ type appState struct {
 	now    func() time.Time
 	out    io.Writer
 
+	preflightFn  func(ctx context.Context) error
 	recordFn     func(ctx context.Context, opts recordOptions) (string, error)
 	transcribeFn func(ctx context.Context, audioPath string) (string, error)
 	copyFn       func(ctx context.Context, value string) error
@@ -56,6 +58,7 @@ func NewRootCmd() *cobra.Command {
 		now:          time.Now,
 		out:          os.Stdout,
 	}
+	app.preflightFn = app.ensureTranscriptionReady
 	app.recordFn = app.recordAudio
 	app.transcribeFn = app.transcribeAudio
 	app.copyFn = clipboard.CopyText
@@ -102,7 +105,22 @@ func NewRootCmd() *cobra.Command {
 	return cmd
 }
 
+func (a *appState) ensureTranscriptionReady(ctx context.Context) error {
+	if _, err := whisper.NewBundledEngine(a.log()); err != nil {
+		return err
+	}
+	if _, err := a.ensureModelAvailable(ctx); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (a *appState) runDefault(ctx context.Context) error {
+	preflightFn := a.preflightFn
+	if preflightFn == nil {
+		preflightFn = a.ensureTranscriptionReady
+	}
+
 	recordFn := a.recordFn
 	if recordFn == nil {
 		recordFn = a.recordAudio
@@ -116,6 +134,10 @@ func (a *appState) runDefault(ctx context.Context) error {
 	copyFn := a.copyFn
 	if copyFn == nil {
 		copyFn = clipboard.CopyText
+	}
+
+	if err := preflightFn(ctx); err != nil {
+		return err
 	}
 
 	audioPath, err := recordFn(ctx, recordOptions{input: a.input, format: a.inputFormat})
