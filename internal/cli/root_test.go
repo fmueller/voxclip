@@ -25,6 +25,10 @@ func TestRootCommandRegistersCoreSubcommands(t *testing.T) {
 	require.Equal(t, "false", cmd.PersistentFlags().Lookup("copy-empty").DefValue)
 	require.Equal(t, "true", cmd.PersistentFlags().Lookup("silence-gate").DefValue)
 	require.Equal(t, "-65", cmd.PersistentFlags().Lookup("silence-threshold-dbfs").DefValue)
+	require.NotNil(t, cmd.Flags().Lookup("duration"))
+	require.Equal(t, "0s", cmd.Flags().Lookup("duration").DefValue)
+	require.NotNil(t, cmd.Flags().Lookup("immediate"))
+	require.Equal(t, "false", cmd.Flags().Lookup("immediate").DefValue)
 }
 
 func TestRootHelpParsesSuccessfully(t *testing.T) {
