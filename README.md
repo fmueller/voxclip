@@ -31,6 +31,20 @@ The installer:
 - installs `voxclip` to `~/.local/bin` by default
 - installs bundled whisper runtime to `~/.local/libexec/whisper/whisper-cli`
 
+## Prerequisites
+
+Voxclip requires a recording backend to capture audio.
+
+**macOS:**
+
+- `ffmpeg` — required for audio recording (`brew install ffmpeg`)
+
+**Linux** (at least one of):
+
+- `pw-record` (PipeWire) — preferred, usually pre-installed on modern distros
+- `arecord` (ALSA utils) — fallback (`apt install alsa-utils` / `dnf install alsa-utils`)
+- `ffmpeg` — last resort fallback (`apt install ffmpeg` / `dnf install ffmpeg`)
+
 ## Quickstart
 
 ```bash
@@ -112,6 +126,21 @@ macOS backend:
 Use `voxclip devices` for diagnostics and `--backend` to force a backend.
 
 ## Development
+
+### Development prerequisites
+
+**Both platforms:**
+
+- Go 1.26+
+- `git`
+
+**Building whisper-cli** (optional, for local packaging):
+
+- `cmake` (`brew install cmake` / `apt install cmake`)
+
+**Optional convenience:**
+
+- [go-task](https://taskfile.dev) (`brew install go-task`) — for `Taskfile.yml` wrappers
 
 Go toolchain is the source of truth; Taskfile provides convenience wrappers.
 
