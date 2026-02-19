@@ -75,6 +75,8 @@ There is intentionally no `voxclip install` command.
 - `--copy-empty` copy blank transcripts to clipboard (default: false)
 - `--silence-gate` detect near-silent WAV audio and skip transcription (default: true)
 - `--silence-threshold-dbfs` silence gate threshold in dBFS (default: -65)
+- `--duration <duration>` record duration, e.g. `10s`; 0 means interactive start/stop (default: 0)
+- `--immediate` start recording immediately without waiting for Enter (default: false)
 
 ## Model Storage
 

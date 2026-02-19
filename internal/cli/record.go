@@ -38,6 +38,7 @@ func newRecordCmd(app *appState) *cobra.Command {
 
 	cmd.Flags().DurationVar(&opts.duration, "duration", 0, "Record duration, e.g. 6s; 0 means interactive start/stop")
 	cmd.Flags().StringVar(&opts.output, "output", "", "Output WAV file path")
+	cmd.Flags().BoolVar(&app.immediate, "immediate", false, "Start recording immediately without waiting for Enter")
 
 	return cmd
 }
@@ -54,7 +55,7 @@ func (a *appState) recordAudio(ctx context.Context, opts recordOptions) (string,
 	}
 
 	interactive := opts.duration <= 0
-	if interactive {
+	if interactive && !a.immediate {
 		if err := record.WaitForEnter(os.Stdin, os.Stderr, "Press Enter to start recording."); err != nil {
 			return "", err
 		}

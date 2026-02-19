@@ -10,6 +10,7 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
 )
@@ -189,6 +190,33 @@ func TestRunDefaultSkipsTranscribeWhenRecordingIsSilent(t *testing.T) {
 	require.Equal(t, "[BLANK_AUDIO]\n", out.String())
 	_, statErr := os.Stat(path)
 	require.ErrorIs(t, statErr, os.ErrNotExist, "recording should be removed after default flow")
+}
+
+func TestRunDefaultForwardsDurationToRecordOptions(t *testing.T) {
+	out := new(bytes.Buffer)
+	audioFile := filepath.Join(t.TempDir(), "audio.wav")
+	require.NoError(t, os.WriteFile(audioFile, []byte("fake"), 0o644))
+
+	var captured recordOptions
+	app := &appState{
+		out:         out,
+		duration:    5 * time.Second,
+		preflightFn: noopPreflight,
+		recordFn: func(_ context.Context, opts recordOptions) (string, error) {
+			captured = opts
+			return audioFile, nil
+		},
+		transcribeFn: func(_ context.Context, _ string) (string, error) {
+			return "hello", nil
+		},
+		copyFn: func(_ context.Context, _ string) error {
+			return nil
+		},
+	}
+
+	err := app.runDefault(context.Background())
+	require.NoError(t, err)
+	require.Equal(t, 5*time.Second, captured.duration)
 }
 
 func TestRunDefaultPreflightErrorAbortsBeforeRecording(t *testing.T) {

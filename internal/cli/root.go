@@ -36,6 +36,8 @@ type appState struct {
 	copyEmpty    bool
 	silenceGate  bool
 	silenceDBFS  float64
+	duration     time.Duration
+	immediate    bool
 
 	logger *zap.Logger
 	now    func() time.Time
@@ -96,6 +98,8 @@ func NewRootCmd() *cobra.Command {
 	cmd.PersistentFlags().BoolVar(&app.copyEmpty, "copy-empty", false, "Copy blank transcripts to clipboard")
 	cmd.PersistentFlags().BoolVar(&app.silenceGate, "silence-gate", true, "Detect near-silent WAV audio and skip transcription")
 	cmd.PersistentFlags().Float64Var(&app.silenceDBFS, "silence-threshold-dbfs", -65, "Silence gate threshold in dBFS")
+	cmd.Flags().DurationVar(&app.duration, "duration", 0, "Record duration, e.g. 10s; 0 means interactive start/stop")
+	cmd.Flags().BoolVar(&app.immediate, "immediate", false, "Start recording immediately without waiting for Enter")
 
 	cmd.AddCommand(newRecordCmd(app))
 	cmd.AddCommand(newTranscribeCmd(app))
@@ -140,7 +144,7 @@ func (a *appState) runDefault(ctx context.Context) error {
 		return err
 	}
 
-	audioPath, err := recordFn(ctx, recordOptions{input: a.input, format: a.inputFormat})
+	audioPath, err := recordFn(ctx, recordOptions{duration: a.duration, input: a.input, format: a.inputFormat})
 	if err != nil {
 		return err
 	}
