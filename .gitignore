@@ -2,6 +2,10 @@
 # https://github.com/github/gitignore/blob/main/community/Golang/Go.AllowList.gitignore
 #
 # Binaries for programs and plugins
+dist/
+/voxclip
+packaging/whisper/*/whisper-cli
+packaging/whisper/*/whisper-cli.exe
 *.exe
 *.exe~
 *.dll
@@ -28,5 +32,5 @@ go.work.sum
 .env
 
 # Editor/IDE
-# .idea/
-# .vscode/
+.idea/
+.vscode/
