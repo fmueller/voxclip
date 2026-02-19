@@ -144,6 +144,11 @@ func (a *appState) runDefault(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
+	defer func() {
+		if err := os.Remove(audioPath); err != nil {
+			a.log().Warn("failed to remove recording", zap.String("path", audioPath), zap.Error(err))
+		}
+	}()
 
 	transcript, skipped, err := a.silenceGateTranscript(audioPath)
 	if err != nil {

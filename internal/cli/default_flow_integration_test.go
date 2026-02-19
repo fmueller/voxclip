@@ -19,13 +19,15 @@ func noopPreflight(_ context.Context) error { return nil }
 func TestRunDefaultFlowSuccess(t *testing.T) {
 	var order []string
 	out := new(bytes.Buffer)
+	audioFile := filepath.Join(t.TempDir(), "audio.wav")
+	require.NoError(t, os.WriteFile(audioFile, []byte("fake"), 0o644))
 
 	app := &appState{
 		out:         out,
 		preflightFn: noopPreflight,
 		recordFn: func(_ context.Context, _ recordOptions) (string, error) {
 			order = append(order, "record")
-			return "/tmp/voxclip-audio.wav", nil
+			return audioFile, nil
 		},
 		transcribeFn: func(_ context.Context, audioPath string) (string, error) {
 			order = append(order, "transcribe:"+audioPath)
@@ -42,21 +44,25 @@ func TestRunDefaultFlowSuccess(t *testing.T) {
 	require.Equal(t, "hello world\n", out.String())
 	require.Equal(t, []string{
 		"record",
-		"transcribe:/tmp/voxclip-audio.wav",
+		"transcribe:" + audioFile,
 		"copy:hello world",
 	}, order)
+	_, statErr := os.Stat(audioFile)
+	require.ErrorIs(t, statErr, os.ErrNotExist, "recording should be removed after default flow")
 }
 
 func TestRunDefaultClipboardFailureIsNonFatal(t *testing.T) {
 	var order []string
 	out := new(bytes.Buffer)
+	audioFile := filepath.Join(t.TempDir(), "audio.wav")
+	require.NoError(t, os.WriteFile(audioFile, []byte("fake"), 0o644))
 
 	app := &appState{
 		out:         out,
 		preflightFn: noopPreflight,
 		recordFn: func(_ context.Context, _ recordOptions) (string, error) {
 			order = append(order, "record")
-			return "/tmp/voxclip-audio.wav", nil
+			return audioFile, nil
 		},
 		transcribeFn: func(_ context.Context, audioPath string) (string, error) {
 			order = append(order, "transcribe:"+audioPath)
@@ -73,21 +79,25 @@ func TestRunDefaultClipboardFailureIsNonFatal(t *testing.T) {
 	require.Equal(t, "clipboard fallback\n", out.String())
 	require.Equal(t, []string{
 		"record",
-		"transcribe:/tmp/voxclip-audio.wav",
+		"transcribe:" + audioFile,
 		"copy:clipboard fallback",
 	}, order)
+	_, statErr := os.Stat(audioFile)
+	require.ErrorIs(t, statErr, os.ErrNotExist, "recording should be removed after default flow")
 }
 
 func TestRunDefaultSkipsCopyForBlankTranscript(t *testing.T) {
 	var order []string
 	out := new(bytes.Buffer)
+	audioFile := filepath.Join(t.TempDir(), "audio.wav")
+	require.NoError(t, os.WriteFile(audioFile, []byte("fake"), 0o644))
 
 	app := &appState{
 		out:         out,
 		preflightFn: noopPreflight,
 		recordFn: func(_ context.Context, _ recordOptions) (string, error) {
 			order = append(order, "record")
-			return "/tmp/voxclip-audio.wav", nil
+			return audioFile, nil
 		},
 		transcribeFn: func(_ context.Context, audioPath string) (string, error) {
 			order = append(order, "transcribe:"+audioPath)
@@ -104,13 +114,17 @@ func TestRunDefaultSkipsCopyForBlankTranscript(t *testing.T) {
 	require.Equal(t, "[BLANK_AUDIO]\n", out.String())
 	require.Equal(t, []string{
 		"record",
-		"transcribe:/tmp/voxclip-audio.wav",
+		"transcribe:" + audioFile,
 	}, order)
+	_, statErr := os.Stat(audioFile)
+	require.ErrorIs(t, statErr, os.ErrNotExist, "recording should be removed after default flow")
 }
 
 func TestRunDefaultCopiesBlankWhenCopyEmptyEnabled(t *testing.T) {
 	var order []string
 	out := new(bytes.Buffer)
+	audioFile := filepath.Join(t.TempDir(), "audio.wav")
+	require.NoError(t, os.WriteFile(audioFile, []byte("fake"), 0o644))
 
 	app := &appState{
 		out:         out,
@@ -118,7 +132,7 @@ func TestRunDefaultCopiesBlankWhenCopyEmptyEnabled(t *testing.T) {
 		preflightFn: noopPreflight,
 		recordFn: func(_ context.Context, _ recordOptions) (string, error) {
 			order = append(order, "record")
-			return "/tmp/voxclip-audio.wav", nil
+			return audioFile, nil
 		},
 		transcribeFn: func(_ context.Context, audioPath string) (string, error) {
 			order = append(order, "transcribe:"+audioPath)
@@ -135,9 +149,11 @@ func TestRunDefaultCopiesBlankWhenCopyEmptyEnabled(t *testing.T) {
 	require.Equal(t, "[BLANK_AUDIO]\n", out.String())
 	require.Equal(t, []string{
 		"record",
-		"transcribe:/tmp/voxclip-audio.wav",
+		"transcribe:" + audioFile,
 		"copy:[BLANK_AUDIO]",
 	}, order)
+	_, statErr := os.Stat(audioFile)
+	require.ErrorIs(t, statErr, os.ErrNotExist, "recording should be removed after default flow")
 }
 
 func TestRunDefaultSkipsTranscribeWhenRecordingIsSilent(t *testing.T) {
@@ -171,6 +187,8 @@ func TestRunDefaultSkipsTranscribeWhenRecordingIsSilent(t *testing.T) {
 	require.Equal(t, 0, transcribeCalls)
 	require.Equal(t, 0, copyCalls)
 	require.Equal(t, "[BLANK_AUDIO]\n", out.String())
+	_, statErr := os.Stat(path)
+	require.ErrorIs(t, statErr, os.ErrNotExist, "recording should be removed after default flow")
 }
 
 func TestRunDefaultPreflightErrorAbortsBeforeRecording(t *testing.T) {
