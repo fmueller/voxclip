@@ -1,11 +1,8 @@
 # Voxclip
 
-Voxclip is a Go CLI for local voice capture and transcription.
+[![CI](https://github.com/fmueller/voxclip/actions/workflows/ci.yml/badge.svg)](https://github.com/fmueller/voxclip/actions/workflows/ci.yml)
 
-- CLI framework: `github.com/spf13/cobra`
-- Logging: `go.uber.org/zap`
-- Progress bars: `github.com/schollz/progressbar/v3`
-- Tests: standard `testing` + `github.com/stretchr/testify/require`
+Voxclip is a command-line tool for voice capture and transcription that runs entirely on your machine. It supports Linux and macOS. It uses open-source speech models so your audio never leaves your computer — no cloud APIs, no accounts, no network dependency. The default workflow records audio, transcribes it, and copies the result to your clipboard in a single command. I built it to voice-prompt coding agents: a fast, local way to speak instructions to AI coding tools without switching context.
 
 ## Installation
 
