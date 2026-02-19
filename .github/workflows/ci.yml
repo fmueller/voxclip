@@ -1,0 +1,74 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Verify formatting
+        run: |
+          fmt_out="$(gofmt -l .)"
+          if [ -n "$fmt_out" ]; then
+            echo "The following files need gofmt:" >&2
+            echo "$fmt_out" >&2
+            exit 1
+          fi
+
+      - name: Vet
+        run: go vet ./...
+
+      - name: Test
+        run: go test ./...
+
+      - name: Integration-tag tests
+        run: go test -tags=integration ./...
+
+      - name: CLI help smoke test
+        run: |
+          go run ./cmd/voxclip --help
+          go run ./cmd/voxclip setup --help
+          go run ./cmd/voxclip record --help
+          go run ./cmd/voxclip transcribe --help
+          go run ./cmd/voxclip devices --help
+
+      - name: Installer script syntax check
+        run: |
+          bash -n install-voxclip.sh
+          ./install-voxclip.sh --help
+
+  goreleaser-config:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Validate GoReleaser config
+        uses: goreleaser/goreleaser-action@v6
+        with:
+          distribution: goreleaser
+          version: '~> v2'
+          args: check

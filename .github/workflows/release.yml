@@ -1,0 +1,163 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  WHISPER_REF: v1.8.3
+
+jobs:
+  build-whisper:
+    name: Build whisper-cli (${{ matrix.goos }}/${{ matrix.goarch }})
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-latest
+            goos: linux
+            goarch: amd64
+          - runner: ubuntu-24.04-arm
+            goos: linux
+            goarch: arm64
+          - runner: macos-13
+            goos: darwin
+            goarch: amd64
+          - runner: macos-14
+            goos: darwin
+            goarch: arm64
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Linux build deps
+        if: startsWith(matrix.runner, 'ubuntu')
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential cmake
+
+      - name: Build whisper-cli
+        shell: bash
+        run: |
+          set -euo pipefail
+          tmpdir="$(mktemp -d)"
+          trap 'rm -rf "$tmpdir"' EXIT
+
+          git clone --depth 1 --branch "$WHISPER_REF" https://github.com/ggml-org/whisper.cpp.git "$tmpdir/whisper.cpp"
+          cmake -S "$tmpdir/whisper.cpp" -B "$tmpdir/whisper.cpp/build" \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DBUILD_SHARED_LIBS=OFF \
+            -DGGML_OPENMP=OFF
+          cmake --build "$tmpdir/whisper.cpp/build" --config Release --target whisper-cli -j 4
+
+          if [[ -f "$tmpdir/whisper.cpp/build/bin/whisper-cli" ]]; then
+            cp "$tmpdir/whisper.cpp/build/bin/whisper-cli" whisper-cli
+          elif [[ -f "$tmpdir/whisper.cpp/build/src/whisper-cli" ]]; then
+            cp "$tmpdir/whisper.cpp/build/src/whisper-cli" whisper-cli
+          else
+            echo "Could not locate whisper-cli build output" >&2
+            exit 1
+          fi
+
+          chmod +x whisper-cli
+
+          if [[ "${{ matrix.goos }}" == "linux" ]]; then
+            if ldd whisper-cli | grep -E 'libwhisper|libggml' >/dev/null 2>&1; then
+              echo "whisper-cli still links against libwhisper/libggml; expected static linkage" >&2
+              ldd whisper-cli >&2
+              exit 1
+            fi
+          fi
+
+          if [[ "${{ matrix.goos }}" == "darwin" ]]; then
+            if otool -L whisper-cli | grep -E 'libwhisper|libggml' >/dev/null 2>&1; then
+              echo "whisper-cli still links against libwhisper/libggml; expected static linkage" >&2
+              otool -L whisper-cli >&2
+              exit 1
+            fi
+          fi
+
+      - name: Upload whisper artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: whisper-${{ matrix.goos }}-${{ matrix.goarch }}
+          path: whisper-cli
+          if-no-files-found: error
+
+  release:
+    name: GoReleaser
+    runs-on: ubuntu-latest
+    needs: build-whisper
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Download whisper linux/amd64
+        uses: actions/download-artifact@v4
+        with:
+          name: whisper-linux-amd64
+          path: packaging/whisper/linux_amd64
+
+      - name: Download whisper linux/arm64
+        uses: actions/download-artifact@v4
+        with:
+          name: whisper-linux-arm64
+          path: packaging/whisper/linux_arm64
+
+      - name: Download whisper darwin/amd64
+        uses: actions/download-artifact@v4
+        with:
+          name: whisper-darwin-amd64
+          path: packaging/whisper/darwin_amd64
+
+      - name: Download whisper darwin/arm64
+        uses: actions/download-artifact@v4
+        with:
+          name: whisper-darwin-arm64
+          path: packaging/whisper/darwin_arm64
+
+      - name: Ensure whisper binaries executable
+        run: |
+          chmod +x packaging/whisper/linux_amd64/whisper-cli
+          chmod +x packaging/whisper/linux_arm64/whisper-cli
+          chmod +x packaging/whisper/darwin_amd64/whisper-cli
+          chmod +x packaging/whisper/darwin_arm64/whisper-cli
+
+      - name: Run GoReleaser (snapshot)
+        if: github.event_name == 'workflow_dispatch'
+        uses: goreleaser/goreleaser-action@v6
+        with:
+          distribution: goreleaser
+          version: '~> v2'
+          args: release --snapshot --clean
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          HOMEBREW_TAP_GITHUB_TOKEN: ${{ secrets.HOMEBREW_TAP_GITHUB_TOKEN }}
+
+      - name: Run GoReleaser (tag release)
+        if: github.event_name == 'push'
+        uses: goreleaser/goreleaser-action@v6
+        with:
+          distribution: goreleaser
+          version: '~> v2'
+          args: release --clean
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          HOMEBREW_TAP_GITHUB_TOKEN: ${{ secrets.HOMEBREW_TAP_GITHUB_TOKEN }}

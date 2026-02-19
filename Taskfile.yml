@@ -1,0 +1,69 @@
+version: "3"
+
+tasks:
+  whisper:build:
+    desc: Build and stage whisper-cli for current host
+    cmds:
+      - ./scripts/build-whisper-cli.sh
+
+  tidy:
+    desc: Tidy Go module dependencies
+    cmds:
+      - go mod tidy
+
+  build:
+    desc: Build voxclip CLI
+    cmds:
+      - go build ./cmd/voxclip
+
+  test:
+    desc: Run unit tests
+    cmds:
+      - go test ./...
+
+  test:integration:
+    desc: Run integration tests
+    cmds:
+      - go test -tags=integration ./...
+
+  run:
+    desc: Run voxclip with default flow
+    cmds:
+      - go run ./cmd/voxclip
+
+  run:setup:
+    desc: Run setup command
+    cmds:
+      - go run ./cmd/voxclip setup
+
+  run:devices:
+    desc: Run devices command
+    cmds:
+      - go run ./cmd/voxclip devices
+
+  run:record:
+    desc: Run record command
+    cmds:
+      - go run ./cmd/voxclip record
+
+  run:transcribe:
+    desc: Run transcribe command
+    cmds:
+      - go run ./cmd/voxclip transcribe
+
+  release:check:
+    desc: Validate goreleaser configuration
+    cmds:
+      - goreleaser check
+
+  release:dry:
+    desc: Build snapshot release artifacts for all targets
+    cmds:
+      - goreleaser release --snapshot --clean
+
+  release:dry:host:
+    desc: Build snapshot artifacts for current OS/arch only
+    deps:
+      - whisper:build
+    cmds:
+      - goreleaser build --snapshot --clean --single-target

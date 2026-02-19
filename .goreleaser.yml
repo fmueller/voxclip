@@ -1,0 +1,61 @@
+version: 2
+
+project_name: voxclip
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - id: voxclip
+    main: ./cmd/voxclip
+    binary: voxclip
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w
+      - -X github.com/fmueller/voxclip/internal/version.Version={{ .Version }}
+      - -X github.com/fmueller/voxclip/internal/version.Commit={{ .Commit }}
+      - -X github.com/fmueller/voxclip/internal/version.Date={{ .Date }}
+
+archives:
+  - id: voxclip
+    ids:
+      - voxclip
+    formats:
+      - tar.gz
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    files:
+      - src: packaging/whisper/{{ .Os }}_{{ .Arch }}/whisper-cli
+        dst: libexec/whisper/whisper-cli
+      - src: LICENSE
+        dst: LICENSE
+      - src: README.md
+        dst: README.md
+
+checksum:
+  name_template: checksums.txt
+
+brews:
+  - name: voxclip
+    repository:
+      owner: fmueller
+      name: homebrew-tap
+      branch: main
+      token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
+    directory: Formula
+    homepage: https://github.com/fmueller/voxclip
+    description: Record and transcribe audio with bundled whisper engine
+    license: Apache-2.0
+    install: |
+      bin.install "voxclip"
+      (libexec/"whisper").install "libexec/whisper/whisper-cli"
+
+changelog:
+  use: git
