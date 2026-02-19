@@ -11,6 +11,7 @@ Guidance for coding agents working in the Voxclip repository.
 - Commands and local workflows: `Taskfile.yml`.
 - CI checks and required validations: `.github/workflows/ci.yml`.
 - Release pipeline: `.github/workflows/release.yml` and `.goreleaser.yml`.
+- Release process and packaging docs: `RELEASING.md` and `packaging/whisper/README.md`.
 - Product behavior and user docs: `README.md`.
 
 ## Toolchain and environment
@@ -135,6 +136,7 @@ Follow existing conventions and keep CLI UX stable.
 - Run full `go test ./...` before handing off broad changes.
 - If integration paths changed, run `go test -tags=integration ./...`.
 - Update `README.md` when CLI flags/commands/behavior change.
+- Update `RELEASING.md` (and `packaging/whisper/README.md` when needed) when release flow, packaging layout, or required secrets change.
 
 ## Agent do/don'ts (PR + commits)
 - Do keep branches and PRs focused on one logical change.

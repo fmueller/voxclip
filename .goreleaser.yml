@@ -42,20 +42,5 @@ archives:
 checksum:
   name_template: checksums.txt
 
-brews:
-  - name: voxclip
-    repository:
-      owner: fmueller
-      name: homebrew-tap
-      branch: main
-      token: "{{ .Env.HOMEBREW_TAP_GITHUB_TOKEN }}"
-    directory: Formula
-    homepage: https://github.com/fmueller/voxclip
-    description: Record and transcribe audio with bundled whisper engine
-    license: Apache-2.0
-    install: |
-      bin.install "voxclip"
-      (libexec/"whisper").install "libexec/whisper/whisper-cli"
-
 changelog:
   use: git

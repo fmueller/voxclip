@@ -149,7 +149,6 @@ jobs:
           args: release --snapshot --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          HOMEBREW_TAP_GITHUB_TOKEN: ${{ secrets.HOMEBREW_TAP_GITHUB_TOKEN }}
 
       - name: Run GoReleaser (tag release)
         if: github.event_name == 'push'
@@ -160,4 +159,3 @@ jobs:
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          HOMEBREW_TAP_GITHUB_TOKEN: ${{ secrets.HOMEBREW_TAP_GITHUB_TOKEN }}

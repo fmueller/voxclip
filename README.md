@@ -31,15 +31,6 @@ The installer:
 - installs `voxclip` to `~/.local/bin` by default
 - installs bundled whisper runtime to `~/.local/libexec/whisper/whisper-cli`
 
-### Homebrew (planned via tap)
-
-Releases are configured for Homebrew publishing through GoReleaser (`.goreleaser.yml`, `brews` section).
-
-Target tap repo layout:
-
-- `homebrew-tap/`
-  - `Formula/voxclip.rb`
-
 ## Quickstart
 
 ```bash
@@ -131,46 +122,4 @@ task test
 task test:integration
 ```
 
-Release-related tasks:
-
-```bash
-task whisper:build
-task release:check
-task release:dry
-```
-
-## GitHub Actions
-
-Two workflows are included:
-
-- `.github/workflows/ci.yml`
-  - runs on `push` to `main` and on PRs
-  - checks gofmt, runs `go vet`, unit tests, integration-tag tests, CLI help smoke tests, and installer script validation
-- `.github/workflows/release.yml`
-  - runs on tags (`v*`) and manual dispatch
-  - builds `whisper-cli` for `linux/amd64`, `linux/arm64`, `darwin/amd64`, `darwin/arm64`
-  - stages binaries into `packaging/whisper/<os>_<arch>/whisper-cli`
-  - runs GoReleaser to publish release artifacts and checksums
-
-Required repository secret for Homebrew publishing:
-
-- `HOMEBREW_TAP_GITHUB_TOKEN`
-
-## Release Packaging Notes
-
-GoReleaser expects platform-specific whisper binaries before packaging:
-
-- `packaging/whisper/linux_amd64/whisper-cli`
-- `packaging/whisper/linux_arm64/whisper-cli`
-- `packaging/whisper/darwin_amd64/whisper-cli`
-- `packaging/whisper/darwin_arm64/whisper-cli`
-
-These files are included in release archives under `libexec/whisper/whisper-cli`.
-
-You can stage your current host platform binary locally with:
-
-```bash
-./scripts/build-whisper-cli.sh
-```
-
-For tagged releases, GitHub Actions builds and stages all four target binaries automatically.
+For release process and packaging details, see `RELEASING.md`.
