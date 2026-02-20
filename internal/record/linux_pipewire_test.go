@@ -43,26 +43,32 @@ func TestPipeWireDurationModeDoesNotUseDurationFlag(t *testing.T) {
 
 func TestPipeWireDurationModeReturnsContextCancellation(t *testing.T) {
 	tempDir := t.TempDir()
+	readyFile := filepath.Join(tempDir, "ready.txt")
 
 	stubPath := filepath.Join(tempDir, "pw-record")
-	stub := "#!/bin/sh\nset -eu\nwhile :; do sleep 0.02; done\n"
+	stub := "#!/bin/sh\nset -eu\ntouch \"$READY_FILE\"\nwhile :; do sleep 0.02; done\n"
 	require.NoError(t, os.WriteFile(stubPath, []byte(stub), 0o755))
 
 	t.Setenv("PATH", tempDir+":"+os.Getenv("PATH"))
+	t.Setenv("READY_FILE", readyFile)
 
 	backend := newPipeWireBackend()
 	require.True(t, backend.Available())
 
 	ctx, cancel := context.WithCancel(context.Background())
+	errCh := make(chan error, 1)
 	go func() {
-		time.Sleep(80 * time.Millisecond)
-		cancel()
+		errCh <- backend.Record(ctx, Config{
+			OutputPath: filepath.Join(tempDir, "out.wav"),
+			Duration:   3 * time.Second,
+		})
 	}()
+	t.Cleanup(cancel)
 
-	err := backend.Record(ctx, Config{
-		OutputPath: filepath.Join(tempDir, "out.wav"),
-		Duration:   3 * time.Second,
-	})
+	waitForFile(t, readyFile, time.Second)
+	cancel()
+
+	err := <-errCh
 	require.ErrorIs(t, err, context.Canceled)
 }
 
