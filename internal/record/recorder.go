@@ -20,6 +20,8 @@ import (
 var ErrInteractiveRequiresTTY = errors.New("interactive recording requires terminal input")
 var ErrNoBackendAvailable = errors.New("no recording backend available")
 
+const timedStopGracePeriod = 750 * time.Millisecond
+
 type Config struct {
 	OutputPath  string
 	Duration    time.Duration
@@ -260,8 +262,14 @@ func runTimedCommand(ctx context.Context, cmd *exec.Cmd, duration time.Duration,
 		case err := <-done:
 			return err
 		case <-timer.C:
-			stopSignalSent := cmd.Process.Signal(os.Interrupt) == nil
-			err := <-done
+			stopSignalSent := signalInterrupt(cmd.Process)
+			err, exited := waitForDone(done, timedStopGracePeriod)
+			if !exited {
+				logger.Debug("recording process did not exit after timed stop signal; killing")
+				_ = cmd.Process.Kill()
+				err = <-done
+			}
+
 			if err == nil {
 				return nil
 			}
@@ -283,10 +291,37 @@ func runTimedCommand(ctx context.Context, cmd *exec.Cmd, duration time.Duration,
 
 			return err
 		case <-ctx.Done():
-			_ = cmd.Process.Signal(os.Interrupt)
-			<-done
+			_ = signalInterrupt(cmd.Process)
+			if _, exited := waitForDone(done, timedStopGracePeriod); !exited {
+				logger.Debug("recording process did not exit after context cancellation; killing")
+				_ = cmd.Process.Kill()
+				<-done
+			}
 			return ctx.Err()
 		}
+	}
+}
+
+func signalInterrupt(process *os.Process) bool {
+	if process == nil {
+		return false
+	}
+	return process.Signal(os.Interrupt) == nil
+}
+
+func waitForDone(done <-chan error, timeout time.Duration) (error, bool) {
+	if timeout <= 0 {
+		return <-done, true
+	}
+
+	timer := time.NewTimer(timeout)
+	defer timer.Stop()
+
+	select {
+	case err := <-done:
+		return err, true
+	case <-timer.C:
+		return nil, false
 	}
 }
 
