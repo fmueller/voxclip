@@ -71,7 +71,7 @@ There is intentionally no `voxclip install` command.
 - `--model-dir <path>` override model storage directory
 - `--language <auto|en|de|...>` language selection
 - `--auto-download` auto-download missing models (default: true)
-- `--backend <auto|pw-record|arecord|ffmpeg>` recording backend override
+- `--backend <auto|pw-record|arecord|ffmpeg>` preferred recording backend; if it fails, Voxclip tries the remaining available backends
 - `--copy-empty` copy blank transcripts to clipboard (default: false)
 - `--silence-gate` detect near-silent WAV audio and skip transcription (default: true)
 - `--silence-threshold-dbfs` silence gate threshold in dBFS (default: -65)

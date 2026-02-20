@@ -26,5 +26,7 @@ Initial development history before the first tagged release.
 - Moved the bootstrap installer script to `scripts/install-voxclip.sh` for repository consistency.
 - Default flow now removes temporary recordings after completion.
 - Input device and recording format flags are handled consistently across commands.
+- Recording now falls back across implemented backends at runtime; errors are surfaced only after all backend attempts fail.
+- PipeWire duration recording no longer depends on `pw-record --duration`; Voxclip now stops timed recordings itself for broader version compatibility.
 
 [unreleased]: https://github.com/fmueller/voxclip/commits/main

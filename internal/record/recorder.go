@@ -83,6 +83,97 @@ func NewBackend(preferred string) (Backend, error) {
 	return SelectBackend(backends, preferred)
 }
 
+func RecordWithFallback(ctx context.Context, preferred string, cfg Config) (string, error) {
+	backends := DefaultBackends(runtime.GOOS)
+	if len(backends) == 0 {
+		return "", fmt.Errorf("unsupported OS: %s", runtime.GOOS)
+	}
+
+	return recordWithFallback(ctx, backends, preferred, cfg)
+}
+
+func recordWithFallback(ctx context.Context, backends []Backend, preferred string, cfg Config) (string, error) {
+	orderedBackends, err := orderBackends(backends, preferred)
+	if err != nil {
+		return "", err
+	}
+
+	var errs []error
+	for _, backend := range orderedBackends {
+		if !backend.Available() {
+			errs = append(errs, fmt.Errorf("%s: backend is not available", backend.Name()))
+			continue
+		}
+
+		err := backend.Record(ctx, cfg)
+		if err == nil {
+			return backend.Name(), nil
+		}
+
+		if cleanupErr := removePartialRecording(cfg.OutputPath); cleanupErr != nil {
+			errs = append(errs, fmt.Errorf("%s: cleanup partial recording %q: %w", backend.Name(), cfg.OutputPath, cleanupErr))
+		}
+
+		err = fmt.Errorf("%s: %w", backend.Name(), err)
+		errs = append(errs, err)
+
+		if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
+			return "", err
+		}
+	}
+
+	if len(errs) == 0 {
+		return "", ErrNoBackendAvailable
+	}
+
+	return "", fmt.Errorf("record audio with available backends: %w", errors.Join(errs...))
+}
+
+func orderBackends(backends []Backend, preferred string) ([]Backend, error) {
+	if len(backends) == 0 {
+		return nil, errors.New("no backends configured")
+	}
+
+	if preferred == "" || preferred == "auto" {
+		return backends, nil
+	}
+
+	preferredIndex := -1
+	for i, backend := range backends {
+		if backend.Name() == preferred {
+			preferredIndex = i
+			break
+		}
+	}
+	if preferredIndex == -1 {
+		return nil, fmt.Errorf("unknown backend %q", preferred)
+	}
+
+	ordered := make([]Backend, 0, len(backends))
+	ordered = append(ordered, backends[preferredIndex])
+	for i, backend := range backends {
+		if i == preferredIndex {
+			continue
+		}
+		ordered = append(ordered, backend)
+	}
+
+	return ordered, nil
+}
+
+func removePartialRecording(path string) error {
+	if strings.TrimSpace(path) == "" {
+		return nil
+	}
+
+	err := os.Remove(path)
+	if errors.Is(err, os.ErrNotExist) {
+		return nil
+	}
+
+	return err
+}
+
 func WaitForEnter(in io.Reader, out io.Writer, message string) error {
 	if !term.IsTerminal(int(os.Stdin.Fd())) {
 		return ErrInteractiveRequiresTTY
@@ -140,6 +231,62 @@ func runInteractiveCommand(ctx context.Context, cmd *exec.Cmd, logger *zap.Logge
 		return ctx.Err()
 	default:
 		return err
+	}
+}
+
+func runTimedCommand(ctx context.Context, cmd *exec.Cmd, duration time.Duration, logger *zap.Logger) error {
+	if duration <= 0 {
+		return cmd.Run()
+	}
+
+	if logger == nil {
+		logger = zap.NewNop()
+	}
+
+	if err := cmd.Start(); err != nil {
+		return err
+	}
+
+	done := make(chan error, 1)
+	go func() {
+		done <- cmd.Wait()
+	}()
+
+	timer := time.NewTimer(duration)
+	defer timer.Stop()
+
+	for {
+		select {
+		case err := <-done:
+			return err
+		case <-timer.C:
+			stopSignalSent := cmd.Process.Signal(os.Interrupt) == nil
+			err := <-done
+			if err == nil {
+				return nil
+			}
+
+			if stopSignalSent {
+				logger.Debug("recording process exited after timed stop signal", zap.Error(err))
+				return nil
+			}
+
+			var exitErr *exec.ExitError
+			if errors.As(err, &exitErr) {
+				if status, ok := exitErr.Sys().(syscall.WaitStatus); ok {
+					if status.Signaled() {
+						logger.Debug("recording process stopped by signal", zap.String("signal", status.Signal().String()))
+						return nil
+					}
+				}
+			}
+
+			return err
+		case <-ctx.Done():
+			_ = cmd.Process.Signal(os.Interrupt)
+			<-done
+			return ctx.Err()
+		}
 	}
 }
 
