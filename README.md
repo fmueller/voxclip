@@ -14,10 +14,10 @@ Voxclip is installed from release artifacts. The CLI itself does **not** perform
 curl -fsSL https://raw.githubusercontent.com/fmueller/voxclip/main/install-voxclip.sh | sh
 ```
 
-Optional version pin:
+Optional: pin to a specific release tag:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/fmueller/voxclip/main/install-voxclip.sh | sh -s -- --version v1.2.3
+curl -fsSL https://raw.githubusercontent.com/fmueller/voxclip/main/install-voxclip.sh | sh -s -- --version vX.Y.Z
 ```
 
 The installer:
