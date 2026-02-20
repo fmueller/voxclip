@@ -63,8 +63,8 @@ Use these defaults unless a task requires otherwise.
 - `go run ./cmd/voxclip devices --help`
 
 ### Installer script checks used in CI
-- Syntax check: `bash -n install-voxclip.sh`
-- Help command: `./install-voxclip.sh --help`
+- Syntax check: `bash -n scripts/install-voxclip.sh`
+- Help command: `./scripts/install-voxclip.sh --help`
 
 ### Release-related commands
 - Build bundled whisper binary for current host: `./scripts/build-whisper-cli.sh`

@@ -11,7 +11,7 @@ usage() {
 Install voxclip from GitHub Releases.
 
 Usage:
-  install-voxclip.sh [--version vX.Y.Z] [--prefix PATH] [--bin-dir PATH]
+  scripts/install-voxclip.sh [--version vX.Y.Z] [--prefix PATH] [--bin-dir PATH]
 
 Options:
   --version   Release tag to install (default: latest release)
@@ -20,8 +20,8 @@ Options:
   -h, --help  Show this help
 
 Examples:
-  curl -fsSL https://raw.githubusercontent.com/fmueller/voxclip/main/install-voxclip.sh | sh
-  curl -fsSL https://raw.githubusercontent.com/fmueller/voxclip/main/install-voxclip.sh | sh -s -- --version v1.2.3
+  curl -fsSL https://raw.githubusercontent.com/fmueller/voxclip/main/scripts/install-voxclip.sh | sh
+  curl -fsSL https://raw.githubusercontent.com/fmueller/voxclip/main/scripts/install-voxclip.sh | sh -s -- --version v1.2.3
 HELP
 }
 

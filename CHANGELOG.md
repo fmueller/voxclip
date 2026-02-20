@@ -23,6 +23,7 @@ Initial development history before the first tagged release.
 ### Changed
 
 - Installation is centered on official release artifacts and the installer script.
+- Moved the bootstrap installer script to `scripts/install-voxclip.sh` for repository consistency.
 - Default flow now removes temporary recordings after completion.
 - Input device and recording format flags are handled consistently across commands.
 

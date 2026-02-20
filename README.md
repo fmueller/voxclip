@@ -11,13 +11,13 @@ Voxclip is installed from release artifacts. The CLI itself does **not** perform
 ### Bootstrap installer (`curl | sh`)
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/fmueller/voxclip/main/install-voxclip.sh | sh
+curl -fsSL https://raw.githubusercontent.com/fmueller/voxclip/main/scripts/install-voxclip.sh | sh
 ```
 
 Optional: pin to a specific release tag:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/fmueller/voxclip/main/install-voxclip.sh | sh -s -- --version vX.Y.Z
+curl -fsSL https://raw.githubusercontent.com/fmueller/voxclip/main/scripts/install-voxclip.sh | sh -s -- --version vX.Y.Z
 ```
 
 The installer:

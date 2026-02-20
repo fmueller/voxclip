@@ -77,8 +77,8 @@ jobs:
 
       - name: Installer script syntax check
         run: |
-          bash -n install-voxclip.sh
-          ./install-voxclip.sh --help
+          bash -n scripts/install-voxclip.sh
+          ./scripts/install-voxclip.sh --help
 
   goreleaser-config:
     runs-on: ubuntu-latest
