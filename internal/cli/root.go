@@ -70,7 +70,7 @@ func NewRootCmd() *cobra.Command {
 		Short:         "Record and transcribe audio with a bundled whisper engine",
 		SilenceUsage:  true,
 		SilenceErrors: true,
-		Version:       version.Version,
+		Version:       version.Resolve(),
 		PersistentPreRunE: func(_ *cobra.Command, _ []string) error {
 			logger, err := logging.New(logging.Options{Verbose: app.verbose, JSON: app.jsonLogs})
 			if err != nil {
@@ -84,6 +84,8 @@ func NewRootCmd() *cobra.Command {
 			return app.runDefault(cmd.Context())
 		},
 	}
+
+	cmd.SetVersionTemplate("{{.Name}} v{{.Version}}\n")
 
 	cmd.PersistentFlags().BoolVar(&app.verbose, "verbose", false, "Enable verbose logs")
 	cmd.PersistentFlags().BoolVar(&app.jsonLogs, "json", false, "Enable JSON logging")
