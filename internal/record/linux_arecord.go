@@ -41,12 +41,23 @@ func (b *alsaBackend) Record(ctx context.Context, cfg Config) error {
 		args = append([]string{"-d", strconv.Itoa(int(cfg.Duration / time.Second))}, args...)
 	}
 
-	cmd := exec.CommandContext(ctx, "arecord", args...)
+	var cmd *exec.Cmd
+	if cfg.Interactive {
+		cmd = exec.CommandContext(ctx, "arecord", args...)
+	} else if cfg.Duration > 0 {
+		cmd = exec.Command("arecord", args...)
+	} else {
+		cmd = exec.CommandContext(ctx, "arecord", args...)
+	}
 	cmd.Stdout = os.Stderr
 	cmd.Stderr = os.Stderr
 
 	if cfg.Interactive {
 		return runInteractiveCommand(ctx, cmd, cfg.Logger)
+	}
+
+	if cfg.Duration > 0 {
+		return runTimedCommand(ctx, cmd, cfg.Duration, cfg.Logger)
 	}
 
 	return cmd.Run()
