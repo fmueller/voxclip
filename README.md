@@ -52,6 +52,10 @@ voxclip
 - `voxclip setup` downloads and verifies the selected model.
 - `voxclip` runs the default flow: record -> transcribe -> copy.
 
+## Examples
+
+- For voice-prompt workflows with terminal coding agents (interactive sessions, hotkey auto-paste, and one-shot invocation), see `examples/README.md`.
+
 ## Commands
 
 - `voxclip` default flow: record -> transcribe -> copy

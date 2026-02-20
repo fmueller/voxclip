@@ -1,32 +1,12 @@
 # Voice-Prompt Integration Examples
 
-These scripts integrate voxclip with CLI coding agents and system hotkeys for hands-free voice prompting.
+These scripts integrate voxclip with terminal coding agents and system hotkeys for voice prompting.
 
-## Shell Functions
+They are agent-agnostic and work with tools like `claude`, `codex`, `opencode`, `crush`, and `aider`.
 
-### `vprompt` — command substitution (fixed duration)
+## Interactive sessions (agent already open)
 
-Source the helper and use it inside `$(...)`:
-
-```bash
-source examples/vprompt.sh
-
-claude "$(vprompt)"
-aider --message "$(vprompt)"
-```
-
-Recording lasts for a fixed duration (default 10s, configurable via `VPROMPT_DURATION`). No TTY is required, so it works inside command substitution where stdin is not a terminal.
-
-```bash
-export VPROMPT_DURATION=15s
-claude "$(vprompt)"
-```
-
-To load automatically, add to your `~/.bashrc` or `~/.zshrc`:
-
-```bash
-source /path/to/voxclip/examples/vprompt.sh
-```
+Interactive means your coding agent is already running in a terminal session and you use voxclip to insert text into that live prompt instead of typing everything.
 
 ### `vprompt_interactive` — interactive mode (Enter to stop)
 
@@ -41,7 +21,14 @@ vprompt_interactive
 # Paste with Cmd+V (macOS) or Ctrl+Shift+V (terminal).
 ```
 
-This is useful when you are already in an agent session (e.g. Claude Code) and want to record a voice note in a split pane or tab, then paste the result.
+This is useful when you are already in an agent session and want to record a voice note in a split pane or tab, then paste the result.
+
+Example mixed text + voice flow in one live session:
+
+1. Type context in the agent prompt.
+2. Capture a voice chunk with `vprompt_interactive` in another pane/tab.
+3. Paste transcript into the agent prompt.
+4. Type final constraints and submit.
 
 ## Auto-Paste Hotkey
 
@@ -49,7 +36,7 @@ This is useful when you are already in an agent session (e.g. Claude Code) and w
 
 ### What happens in practice
 
-1. You are typing in a Claude Code terminal session.
+1. You are typing in a terminal coding agent session.
 2. You press a global keyboard shortcut (e.g. `Ctrl+Shift+V`).
 3. The system runs `vpaste.sh` in the background — your microphone activates and records for N seconds (default 8s).
 4. Voxclip transcribes the audio locally using the bundled whisper engine.
@@ -93,4 +80,32 @@ Set `VPROMPT_DURATION` to change the recording length:
 
 ```bash
 export VPROMPT_DURATION=12s
+```
+
+## One-shot invocation (non-interactive)
+
+### `vprompt` — command substitution (fixed duration)
+
+Source the helper and use it inside `$(...)`:
+
+```bash
+source examples/vprompt.sh
+
+your-agent-cli "$(vprompt)"
+```
+
+Recording lasts for a fixed duration (default 10s, configurable via `VPROMPT_DURATION`). No TTY is required, so it works inside command substitution where stdin is not a terminal.
+
+For example:
+
+```bash
+export VPROMPT_DURATION=15s
+claude "$(vprompt)"
+aider --message "$(vprompt)"
+```
+
+To load automatically, add to your `~/.bashrc` or `~/.zshrc`:
+
+```bash
+source /path/to/voxclip/examples/vprompt.sh
 ```
