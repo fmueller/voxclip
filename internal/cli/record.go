@@ -44,11 +44,6 @@ func newRecordCmd(app *appState) *cobra.Command {
 }
 
 func (a *appState) recordAudio(ctx context.Context, opts recordOptions) (string, error) {
-	backend, err := record.NewBackend(a.backend)
-	if err != nil {
-		return "", err
-	}
-
 	outPath, err := a.recordingOutputPath(opts.output)
 	if err != nil {
 		return "", err
@@ -61,7 +56,7 @@ func (a *appState) recordAudio(ctx context.Context, opts recordOptions) (string,
 		}
 	}
 
-	a.log().Info("recording started", zap.String("backend", backend.Name()), zap.String("output", outPath))
+	a.log().Info("recording started", zap.String("backend", a.backend), zap.String("output", outPath))
 	stopProgress := func() {}
 	if interactive {
 		stopProgress = startSpinner(a.progressEnabled(), "Recording")
@@ -81,10 +76,11 @@ func (a *appState) recordAudio(ctx context.Context, opts recordOptions) (string,
 		Logger:      a.log(),
 	}
 
-	if err := backend.Record(ctx, recConfig); err != nil {
-		return "", fmt.Errorf("record audio with backend %s: %w", backend.Name(), err)
+	backendName, err := record.RecordWithFallback(ctx, a.backend, recConfig)
+	if err != nil {
+		return "", err
 	}
 
-	a.log().Info("recording finished", zap.String("path", outPath))
+	a.log().Info("recording finished", zap.String("backend", backendName), zap.String("path", outPath))
 	return outPath, nil
 }

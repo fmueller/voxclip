@@ -7,7 +7,6 @@ import (
 	"os"
 	"os/exec"
 	"strconv"
-	"time"
 )
 
 type pipewireBackend struct{}
@@ -34,9 +33,6 @@ func (b *pipewireBackend) Record(ctx context.Context, cfg Config) error {
 	}
 
 	args := []string{"--rate", strconv.Itoa(defaultSampleRate(cfg.SampleRate)), "--channels", strconv.Itoa(defaultChannels(cfg.Channels)), "--format", "s16", cfg.OutputPath}
-	if cfg.Duration > 0 {
-		args = append([]string{"--duration", strconv.Itoa(int(cfg.Duration / time.Second))}, args...)
-	}
 
 	cmd := exec.CommandContext(ctx, "pw-record", args...)
 	cmd.Stdout = os.Stderr
@@ -44,6 +40,10 @@ func (b *pipewireBackend) Record(ctx context.Context, cfg Config) error {
 
 	if cfg.Interactive {
 		return runInteractiveCommand(ctx, cmd, cfg.Logger)
+	}
+
+	if cfg.Duration > 0 {
+		return runTimedCommand(ctx, cmd, cfg.Duration, cfg.Logger)
 	}
 
 	return cmd.Run()
