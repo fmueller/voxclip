@@ -137,6 +137,7 @@ Follow existing conventions and keep CLI UX stable.
 - If integration paths changed, run `go test -tags=integration ./...`.
 - Update `README.md` when CLI flags/commands/behavior change.
 - Update `RELEASING.md` (and `packaging/whisper/README.md` when needed) when release flow, packaging layout, or required secrets change.
+- Update `CHANGELOG.md` for user-visible behavior changes; keep entries user-facing and skip internal-only maintenance noise.
 
 ## Agent do/don'ts (PR + commits)
 - Do keep branches and PRs focused on one logical change.

@@ -7,6 +7,7 @@ This document is for maintainers and release engineers.
 - Release workflow: `.github/workflows/release.yml`
 - CI validation workflow: `.github/workflows/ci.yml`
 - GoReleaser config: `.goreleaser.yml`
+- Changelog and release notes: `CHANGELOG.md`
 - Whisper staging details: `packaging/whisper/README.md`
 - User-facing CLI docs: `README.md`
 
@@ -26,6 +27,14 @@ Equivalent GoReleaser commands:
 goreleaser check
 goreleaser release --snapshot --clean
 ```
+
+## Changelog policy
+
+`CHANGELOG.md` is user-facing release notes.
+
+- Keep entries focused on CLI behavior, flags, workflows, installation UX, and compatibility notes.
+- Do not list internal-only refactors, CI plumbing, or dependency bumps unless users are affected.
+- Keep upcoming changes under `## [Unreleased]` and move them into a dated version section when tagging a release.
 
 ## Bundled whisper binaries
 

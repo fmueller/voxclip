@@ -149,3 +149,4 @@ task test:integration
 ```
 
 For release process and packaging details, see `RELEASING.md`.
+For user-facing release notes, see `CHANGELOG.md`.
