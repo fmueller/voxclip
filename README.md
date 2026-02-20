@@ -133,11 +133,17 @@ Use `voxclip devices` for diagnostics and `--backend` to force a backend.
 
 **Building whisper-cli** (optional, for local packaging):
 
-- `cmake` (`brew install cmake` / `apt install cmake`)
+- `cmake` (`brew install cmake` / `apt install cmake` / `dnf install cmake`)
 
 **Optional convenience:**
 
-- [go-task](https://taskfile.dev) (`brew install go-task`) — for `Taskfile.yml` wrappers
+- [go-task](https://taskfile.dev) (`brew install go-task` / `dnf install go-task`) — for `Taskfile.yml` wrappers
+- Ubuntu/Debian via apt requires adding Task's repo first:
+
+```bash
+curl -1sLf 'https://dl.cloudsmith.io/public/task/task/setup.deb.sh' | sudo -E bash
+sudo apt install task
+```
 
 Go toolchain is the source of truth; Taskfile provides convenience wrappers.
 
