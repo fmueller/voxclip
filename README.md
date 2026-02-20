@@ -76,6 +76,7 @@ There is intentionally no `voxclip install` command.
 - `--language <auto|en|de|...>` language selection
 - `--auto-download` auto-download missing models (default: true)
 - `--backend <auto|pw-record|arecord|ffmpeg>` preferred recording backend; if it fails, Voxclip tries the remaining available backends
+- `--input <selector>` input device selector for the chosen backend (for example `:1` or `:2` on macOS `ffmpeg`/`avfoundation`)
 - `--copy-empty` copy blank transcripts to clipboard (default: false)
 - `--silence-gate` detect near-silent WAV audio and skip transcription (default: true)
 - `--silence-threshold-dbfs` silence gate threshold in dBFS (default: -65)
@@ -127,6 +128,8 @@ macOS backend:
 1. `ffmpeg` (`avfoundation`)
 
 Use `voxclip devices` for diagnostics and `--backend` to force a backend.
+
+If recording starts using the wrong microphone (for example when iPhone/headphones are connected on macOS), run `voxclip devices`, find the desired input index, and pass it via `--input` (for example `--input ":1"` or `--input ":2"`).
 
 ## Development
 

@@ -93,7 +93,7 @@ func NewRootCmd() *cobra.Command {
 	cmd.PersistentFlags().StringVar(&app.language, "language", "auto", "Language code (auto|en|de|...) for transcription")
 	cmd.PersistentFlags().BoolVar(&app.autoDownload, "auto-download", true, "Automatically download missing models")
 	cmd.PersistentFlags().StringVar(&app.backend, "backend", "auto", "Recording backend: auto|pw-record|arecord|ffmpeg")
-	cmd.PersistentFlags().StringVar(&app.input, "input", "", "Input device selector for backend-specific usage")
+	cmd.PersistentFlags().StringVar(&app.input, "input", "", "Input device selector (use `voxclip devices` to find indexes like :1/:2)")
 	cmd.PersistentFlags().StringVar(&app.inputFormat, "input-format", "", "Input format for ffmpeg backend (pulse|alsa)")
 	cmd.PersistentFlags().BoolVar(&app.copyEmpty, "copy-empty", false, "Copy blank transcripts to clipboard")
 	cmd.PersistentFlags().BoolVar(&app.silenceGate, "silence-gate", true, "Detect near-silent WAV audio and skip transcription")
