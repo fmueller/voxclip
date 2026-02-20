@@ -48,12 +48,23 @@ func (b *ffmpegMacBackend) Record(ctx context.Context, cfg Config) error {
 		cfg.OutputPath,
 	)
 
-	cmd := exec.CommandContext(ctx, "ffmpeg", args...)
+	var cmd *exec.Cmd
+	if cfg.Interactive {
+		cmd = exec.CommandContext(ctx, "ffmpeg", args...)
+	} else if cfg.Duration > 0 {
+		cmd = exec.Command("ffmpeg", args...)
+	} else {
+		cmd = exec.CommandContext(ctx, "ffmpeg", args...)
+	}
 	cmd.Stdout = os.Stderr
 	cmd.Stderr = os.Stderr
 
 	if cfg.Interactive {
 		return runInteractiveCommand(ctx, cmd, cfg.Logger)
+	}
+
+	if cfg.Duration > 0 {
+		return runTimedCommand(ctx, cmd, cfg.Duration, cfg.Logger)
 	}
 
 	return cmd.Run()

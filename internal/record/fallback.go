@@ -67,7 +67,14 @@ func (b *ffmpegLinuxBackend) Record(ctx context.Context, cfg Config) error {
 			cfg.OutputPath,
 		)
 
-		cmd := exec.CommandContext(ctx, "ffmpeg", args...)
+		var cmd *exec.Cmd
+		if cfg.Interactive {
+			cmd = exec.CommandContext(ctx, "ffmpeg", args...)
+		} else if cfg.Duration > 0 {
+			cmd = exec.Command("ffmpeg", args...)
+		} else {
+			cmd = exec.CommandContext(ctx, "ffmpeg", args...)
+		}
 		cmd.Stdout = os.Stderr
 		cmd.Stderr = os.Stderr
 
@@ -76,11 +83,29 @@ func (b *ffmpegLinuxBackend) Record(ctx context.Context, cfg Config) error {
 			if err == nil {
 				return nil
 			}
+			if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
+				return err
+			}
+			errs = append(errs, fmt.Errorf("ffmpeg (%s/%s): %w", candidate.format, candidate.input, err))
+			continue
+		}
+
+		if cfg.Duration > 0 {
+			err := runTimedCommand(ctx, cmd, cfg.Duration, cfg.Logger)
+			if err == nil {
+				return nil
+			}
+			if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
+				return err
+			}
 			errs = append(errs, fmt.Errorf("ffmpeg (%s/%s): %w", candidate.format, candidate.input, err))
 			continue
 		}
 
 		if err := cmd.Run(); err != nil {
+			if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
+				return err
+			}
 			errs = append(errs, fmt.Errorf("ffmpeg (%s/%s): %w", candidate.format, candidate.input, err))
 			continue
 		}
