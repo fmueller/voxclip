@@ -28,5 +28,6 @@ Initial development history before the first tagged release.
 - Input device and recording format flags are handled consistently across commands.
 - Recording now falls back across implemented backends at runtime; errors are surfaced only after all backend attempts fail.
 - PipeWire duration recording no longer depends on `pw-record --duration`; Voxclip now stops timed recordings itself for broader version compatibility.
+- Release archives now include `THIRD_PARTY_NOTICES.md` to document dependency licenses for redistribution.
 
 [unreleased]: https://github.com/fmueller/voxclip/commits/main

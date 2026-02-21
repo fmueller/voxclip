@@ -48,6 +48,13 @@ Release archives include the staged binary as:
 libexec/whisper/whisper-cli
 ```
 
+Release archives also include licensing docs:
+
+```text
+LICENSE
+THIRD_PARTY_NOTICES.md
+```
+
 ## GitHub Actions release flow
 
 `.github/workflows/release.yml` runs on version tags (`v*`) and manual dispatch.

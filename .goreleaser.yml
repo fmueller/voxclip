@@ -38,6 +38,8 @@ archives:
         dst: LICENSE
       - src: README.md
         dst: README.md
+      - src: THIRD_PARTY_NOTICES.md
+        dst: THIRD_PARTY_NOTICES.md
 
 checksum:
   name_template: checksums.txt
