@@ -101,6 +101,22 @@ func TestRunTimedCommandKillsWhenInterruptIgnored(t *testing.T) {
 	require.Less(t, time.Since(start), 3*time.Second)
 }
 
+func TestRunTimedCommandKillsOnTimerWhenInterruptIgnored(t *testing.T) {
+	tempDir, readyFile := setupRunningCommandStub(t, "ignore-int", true)
+
+	cmd := exec.Command(filepath.Join(tempDir, "ignore-int"))
+	errCh := make(chan error, 1)
+	start := time.Now()
+	go func() {
+		errCh <- runTimedCommand(context.Background(), cmd, 100*time.Millisecond, nil)
+	}()
+
+	waitForPath(t, readyFile, time.Second)
+	err := <-errCh
+	require.NoError(t, err)
+	require.Less(t, time.Since(start), 2*time.Second)
+}
+
 func setupRunningCommandStub(t *testing.T, name string, ignoreInterrupt bool) (string, string) {
 	t.Helper()
 
