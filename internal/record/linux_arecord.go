@@ -32,7 +32,11 @@ func (b *alsaBackend) Record(ctx context.Context, cfg Config) error {
 		return err
 	}
 
-	args := []string{"-f", "S16_LE", "-r", strconv.Itoa(defaultSampleRate(cfg.SampleRate)), "-c", strconv.Itoa(defaultChannels(cfg.Channels)), cfg.OutputPath}
+	args := []string{"-f", "S16_LE", "-r", strconv.Itoa(defaultSampleRate(cfg.SampleRate)), "-c", strconv.Itoa(defaultChannels(cfg.Channels))}
+	if cfg.Input != "" {
+		args = append(args, "-D", cfg.Input)
+	}
+	args = append(args, cfg.OutputPath)
 	if cfg.Duration > 0 {
 		args = append([]string{"-d", strconv.Itoa(int(cfg.Duration / time.Second))}, args...)
 	}

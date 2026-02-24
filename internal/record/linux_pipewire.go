@@ -32,7 +32,11 @@ func (b *pipewireBackend) Record(ctx context.Context, cfg Config) error {
 		return err
 	}
 
-	args := []string{"--rate", strconv.Itoa(defaultSampleRate(cfg.SampleRate)), "--channels", strconv.Itoa(defaultChannels(cfg.Channels)), "--format", "s16", cfg.OutputPath}
+	args := []string{"--rate", strconv.Itoa(defaultSampleRate(cfg.SampleRate)), "--channels", strconv.Itoa(defaultChannels(cfg.Channels)), "--format", "s16"}
+	if cfg.Input != "" {
+		args = append(args, "--target", cfg.Input)
+	}
+	args = append(args, cfg.OutputPath)
 
 	cmd := exec.CommandContext(ctx, "pw-record", args...)
 	cmd.Stdout = os.Stderr
