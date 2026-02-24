@@ -104,7 +104,7 @@ For complete command and flag reference, run `voxclip --help` and `voxclip <comm
 - `--model <name|path>` select a model name or local model path
 - `--language <auto|en|de|...>` set transcription language
 - `--backend <auto|pw-record|arecord|ffmpeg>` choose recording backend
-- `--input <selector>` choose input device (for example `:1` on macOS `avfoundation`)
+- `--input <selector>` choose input device (for example `:1` on macOS, a PipeWire node ID for `pw-record`, or `hw:1,0` for `arecord`)
 - `--duration <duration>` set fixed recording duration, e.g. `10s`
 - `--immediate` start recording immediately
 - `--verbose` enable verbose logs
@@ -125,7 +125,11 @@ macOS backend:
 
 Use `voxclip devices` for diagnostics and `--backend` to force a backend.
 
-If recording starts from the wrong microphone (for example when iPhone/headphones are connected on macOS), run `voxclip devices`, find the desired input index, and pass it with `--input` (for example `--input ":1"` or `--input ":2"`).
+If recording starts from the wrong microphone, run `voxclip devices`, find the desired input identifier, and pass it with `--input`:
+
+- **macOS (ffmpeg/avfoundation):** `--input ":1"` or `--input ":2"` (device index)
+- **Linux (pw-record):** `--input "42"` (PipeWire node ID from `pw-cli ls Node`)
+- **Linux (arecord):** `--input "hw:1,0"` (ALSA PCM device from `arecord -L`)
 
 ## Troubleshooting
 

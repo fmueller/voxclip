@@ -11,6 +11,14 @@ Initial development history before the first tagged release.
 
 ### Added
 
+- `--input` flag now selects devices on all Linux backends: `--target` for pw-record and `-D` for arecord.
+
+### Changed
+
+- `--input` flag help text updated with cross-platform examples (macOS, PipeWire, ALSA).
+
+### Previously added
+
 - Native Go CLI with `voxclip`, `record`, `transcribe`, `devices`, and `setup` commands.
 - One-command default flow to record audio, transcribe locally, and copy the transcript to the clipboard.
 - `voxclip setup` workflow for model download and verification.
