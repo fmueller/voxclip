@@ -117,6 +117,25 @@ jobs:
         run: |
           go test -tags=e2e ./internal/cli -run '^TestTranscribeEndToEndWithFSDD$' -count=1
 
+  mutation-test:
+    needs: unit-test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Install gremlins
+        run: go install github.com/go-gremlins/gremlins/cmd/gremlins@v0.6.0
+
+      - name: Run mutation tests
+        run: gremlins unleash --threshold-efficacy 0.25
+
   smoke-test:
     needs: integration-test
     runs-on: ubuntu-latest
