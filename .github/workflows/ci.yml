@@ -76,7 +76,7 @@ jobs:
     env:
       WHISPER_REF: v1.8.3
       VOXCLIP_E2E_MODEL: tiny
-      VOXCLIP_E2E_MODEL_DIR: ${{ runner.temp }}/voxclip-models
+      VOXCLIP_E2E_MODEL_DIR: ${{ github.workspace }}/.cache/voxclip-models
       VOXCLIP_E2E_WHISPER_PATH: ${{ github.workspace }}/packaging/whisper/linux_amd64/whisper-cli
     steps:
       - name: Checkout
