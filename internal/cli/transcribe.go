@@ -56,6 +56,11 @@ func newTranscribeCmd(app *appState) *cobra.Command {
 		},
 	}
 
+	bindLoggingFlags(cmd, app)
+	bindProgressFlag(cmd, app)
+	bindModelFlags(cmd, app)
+	bindLanguageAndModelDownloadFlags(cmd, app)
+	bindCopyAndSilenceFlags(cmd, app)
 	cmd.Flags().BoolVar(&copyToClipboard, "copy", false, "Copy transcript to clipboard")
 	return cmd
 }

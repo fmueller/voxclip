@@ -87,19 +87,12 @@ func NewRootCmd() *cobra.Command {
 
 	cmd.SetVersionTemplate("{{.Name}} v{{.Version}}\n")
 
-	cmd.PersistentFlags().BoolVar(&app.verbose, "verbose", false, "Enable verbose logs")
-	cmd.PersistentFlags().BoolVar(&app.jsonLogs, "json", false, "Enable JSON logging")
-	cmd.PersistentFlags().BoolVar(&app.noProgress, "no-progress", false, "Disable progress indicators")
-	cmd.PersistentFlags().StringVar(&app.model, "model", "small", "Model name or model file path")
-	cmd.PersistentFlags().StringVar(&app.modelDir, "model-dir", "", "Directory where models are stored")
-	cmd.PersistentFlags().StringVar(&app.language, "language", "auto", "Language code (auto|en|de|...) for transcription")
-	cmd.PersistentFlags().BoolVar(&app.autoDownload, "auto-download", true, "Automatically download missing models")
-	cmd.PersistentFlags().StringVar(&app.backend, "backend", "auto", "Recording backend: auto|pw-record|arecord|ffmpeg")
-	cmd.PersistentFlags().StringVar(&app.input, "input", "", "Input device (run `voxclip devices` to list); e.g. node-ID (pw-record), hw:1,0 (arecord), :1 (ffmpeg)")
-	cmd.PersistentFlags().StringVar(&app.inputFormat, "input-format", "", "Input format for ffmpeg backend (pulse|alsa)")
-	cmd.PersistentFlags().BoolVar(&app.copyEmpty, "copy-empty", false, "Copy blank transcripts to clipboard")
-	cmd.PersistentFlags().BoolVar(&app.silenceGate, "silence-gate", true, "Detect near-silent WAV audio and skip transcription")
-	cmd.PersistentFlags().Float64Var(&app.silenceDBFS, "silence-threshold-dbfs", -65, "Silence gate threshold in dBFS")
+	bindLoggingFlags(cmd, app)
+	bindProgressFlag(cmd, app)
+	bindModelFlags(cmd, app)
+	bindLanguageAndModelDownloadFlags(cmd, app)
+	bindRecordingBackendFlags(cmd, app)
+	bindCopyAndSilenceFlags(cmd, app)
 	cmd.Flags().DurationVar(&app.duration, "duration", 0, "Record duration, e.g. 10s; 0 means interactive start/stop")
 	cmd.Flags().BoolVar(&app.immediate, "immediate", false, "Start recording immediately without waiting for Enter")
 
@@ -109,6 +102,37 @@ func NewRootCmd() *cobra.Command {
 	cmd.AddCommand(newSetupCmd(app))
 
 	return cmd
+}
+
+func bindLoggingFlags(cmd *cobra.Command, app *appState) {
+	cmd.Flags().BoolVar(&app.verbose, "verbose", app.verbose, "Enable verbose logs")
+	cmd.Flags().BoolVar(&app.jsonLogs, "json", app.jsonLogs, "Enable JSON logging")
+}
+
+func bindProgressFlag(cmd *cobra.Command, app *appState) {
+	cmd.Flags().BoolVar(&app.noProgress, "no-progress", app.noProgress, "Disable progress indicators")
+}
+
+func bindModelFlags(cmd *cobra.Command, app *appState) {
+	cmd.Flags().StringVar(&app.model, "model", app.model, "Model name or model file path")
+	cmd.Flags().StringVar(&app.modelDir, "model-dir", app.modelDir, "Directory where models are stored")
+}
+
+func bindLanguageAndModelDownloadFlags(cmd *cobra.Command, app *appState) {
+	cmd.Flags().StringVar(&app.language, "language", app.language, "Language code (auto|en|de|...) for transcription")
+	cmd.Flags().BoolVar(&app.autoDownload, "auto-download", app.autoDownload, "Automatically download missing models")
+}
+
+func bindRecordingBackendFlags(cmd *cobra.Command, app *appState) {
+	cmd.Flags().StringVar(&app.backend, "backend", app.backend, "Recording backend: auto|pw-record|arecord|ffmpeg")
+	cmd.Flags().StringVar(&app.input, "input", app.input, "Input device (run \"voxclip devices\" to list); e.g. node-ID (pw-record), hw:1,0 (arecord), :1 (ffmpeg)")
+	cmd.Flags().StringVar(&app.inputFormat, "input-format", app.inputFormat, "Input format for ffmpeg backend (pulse|alsa)")
+}
+
+func bindCopyAndSilenceFlags(cmd *cobra.Command, app *appState) {
+	cmd.Flags().BoolVar(&app.copyEmpty, "copy-empty", app.copyEmpty, "Copy blank transcripts to clipboard")
+	cmd.Flags().BoolVar(&app.silenceGate, "silence-gate", app.silenceGate, "Detect near-silent WAV audio and skip transcription")
+	cmd.Flags().Float64Var(&app.silenceDBFS, "silence-threshold-dbfs", app.silenceDBFS, "Silence gate threshold in dBFS")
 }
 
 func (a *appState) ensureTranscriptionReady(ctx context.Context) error {
