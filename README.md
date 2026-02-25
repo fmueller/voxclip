@@ -222,7 +222,20 @@ task tidy
 task build
 task test
 task test:integration
+task test:e2e
 ```
+
+The e2e test requires a built whisper binary path via `VOXCLIP_E2E_WHISPER_PATH`.
+Example:
+
+```bash
+task whisper:build
+VOXCLIP_E2E_WHISPER_PATH="$(pwd)/packaging/whisper/linux_amd64/whisper-cli" task test:e2e
+```
+
+Adjust the whisper path to your host target directory (for example `darwin_arm64` on Apple Silicon).
+
+You can optionally override the model cache location with `VOXCLIP_E2E_MODEL_DIR`.
 
 For release process and packaging details, see `RELEASING.md`.
 For user-facing release notes, see `CHANGELOG.md`.
