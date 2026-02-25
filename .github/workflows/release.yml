@@ -13,6 +13,9 @@ concurrency:
 env:
   WHISPER_REF: v1.8.3
 
+permissions:
+  contents: read
+
 jobs:
   build-whisper:
     name: Build whisper-cli (${{ matrix.goos }}/${{ matrix.goarch }})
