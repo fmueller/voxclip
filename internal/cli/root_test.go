@@ -52,6 +52,7 @@ func TestRootHelpParsesSuccessfully(t *testing.T) {
 	require.Contains(t, out.String(), "transcribe")
 	require.Contains(t, out.String(), "setup")
 	require.Contains(t, out.String(), "devices")
+	require.Contains(t, out.String(), "version")
 }
 
 func TestSubcommandHelpParsesSuccessfully(t *testing.T) {
@@ -66,6 +67,7 @@ func TestSubcommandHelpParsesSuccessfully(t *testing.T) {
 		{name: "transcribe", args: []string{"transcribe", "--help"}, contains: "Transcribe an audio file"},
 		{name: "devices", args: []string{"devices", "--help"}, contains: "List recording devices"},
 		{name: "setup", args: []string{"setup", "--help"}, contains: "Download and verify speech model assets"},
+		{name: "version", args: []string{"version", "--help"}, contains: "Print the version number"},
 	}
 
 	for _, tt := range tests {
@@ -182,6 +184,15 @@ func TestHelpShowsStrictFlagScopes(t *testing.T) {
 				"Global Flags:",
 			},
 		},
+		{
+			name: "version help has no operational flags",
+			args: []string{"version", "--help"},
+			notContains: []string{
+				"--verbose",
+				"--model string",
+				"Global Flags:",
+			},
+		},
 	}
 
 	for _, tt := range tests {
@@ -207,4 +218,24 @@ func TestHelpShowsStrictFlagScopes(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestVersionCommandOutputMatchesFlag(t *testing.T) {
+	t.Parallel()
+
+	flagOut := new(bytes.Buffer)
+	flagCmd := NewRootCmd()
+	flagCmd.SetOut(flagOut)
+	flagCmd.SetErr(flagOut)
+	flagCmd.SetArgs([]string{"--version"})
+	require.NoError(t, flagCmd.Execute())
+
+	subOut := new(bytes.Buffer)
+	subCmd := NewRootCmd()
+	subCmd.SetOut(subOut)
+	subCmd.SetErr(subOut)
+	subCmd.SetArgs([]string{"version"})
+	require.NoError(t, subCmd.Execute())
+
+	require.Equal(t, flagOut.String(), subOut.String())
 }

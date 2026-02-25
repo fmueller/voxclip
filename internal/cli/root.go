@@ -100,6 +100,7 @@ func NewRootCmd() *cobra.Command {
 	cmd.AddCommand(newTranscribeCmd(app))
 	cmd.AddCommand(newDevicesCmd(app))
 	cmd.AddCommand(newSetupCmd(app))
+	cmd.AddCommand(newVersionCmd())
 
 	return cmd
 }
