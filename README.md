@@ -186,6 +186,18 @@ curl -1sLf 'https://dl.cloudsmith.io/public/task/task/setup.deb.sh' | sudo -E ba
 sudo apt install task
 ```
 
+After cloning, stage a host-local whisper runtime once:
+
+```bash
+task whisper:build
+```
+
+Without Task installed:
+
+```bash
+./scripts/build-whisper-cli.sh
+```
+
 Go toolchain is the source of truth; Taskfile provides convenience wrappers:
 
 ```bash
