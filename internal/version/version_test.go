@@ -87,3 +87,10 @@ func TestResolveVersion_DirtyNoTags(t *testing.T) {
 	got := resolveVersion("1.0.0", git)
 	require.Equal(t, "1.0.0-abcdef-dirty", got)
 }
+
+func TestRunGitInvalidSubcommand(t *testing.T) {
+	t.Parallel()
+	out, err := runGit("__invalid__")
+	require.Error(t, err)
+	require.Empty(t, out)
+}
