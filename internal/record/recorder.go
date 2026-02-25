@@ -307,3 +307,13 @@ func commandOutput(ctx context.Context, name string, args ...string) (string, er
 	}
 	return trimmed, nil
 }
+
+func trimLeadingWhitespacePerLine(s string) string {
+	lines := strings.Split(s, "\n")
+	for i, line := range lines {
+		if strings.HasPrefix(line, "\t") {
+			lines[i] = line[1:]
+		}
+	}
+	return strings.Join(lines, "\n")
+}
