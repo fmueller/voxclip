@@ -65,7 +65,7 @@ Use these defaults unless a task requires otherwise.
 ### Mutation tests
 - Run mutation testing: `gremlins unleash`
 - Task wrapper: `task test:mutate`
-- With quality gate (used in CI): `gremlins unleash --threshold 0.25`
+- With quality gate (used in CI): `gremlins unleash --threshold-efficacy 0.25`
 - Install gremlins: `go install github.com/go-gremlins/gremlins/cmd/gremlins@v0.6.0`
 
 ### Installer script checks used in CI
