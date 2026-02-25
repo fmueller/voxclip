@@ -12,7 +12,7 @@ Voxclip is a command-line tool for voice capture and transcription on Linux and 
 - [Prerequisites](#prerequisites)
 - [Quickstart](#quickstart)
 - [Commands](#commands)
-- [Common Flags](#common-flags)
+- [Flags](#flags)
 - [Recording Backends](#recording-backends)
 - [Troubleshooting](#troubleshooting)
 - [Advanced Runtime Details](#advanced-runtime-details)
@@ -99,17 +99,34 @@ voxclip
 
 For complete command and flag reference, run `voxclip --help` and `voxclip <command> --help`.
 
-## Common Flags
+## Flags
+
+Flags are command-scoped. If you pass a flag to a command that does not support it, Voxclip returns an unknown-flag error.
+
+### Default-flow flags (`voxclip`)
 
 - `--model <name|path>` select a model name or local model path
+- `--model-dir <path>` override model storage directory
 - `--language <auto|en|de|...>` set transcription language
+- `--auto-download` automatically download a missing model
 - `--backend <auto|pw-record|arecord|ffmpeg>` choose recording backend
 - `--input <selector>` choose input device (for example `:1` on macOS, a PipeWire node ID for `pw-record`, or `hw:1,0` for `arecord`)
+- `--input-format <pulse|alsa>` force ffmpeg input format on Linux
+- `--copy-empty` copy blank transcripts to clipboard
+- `--silence-gate` enable near-silent WAV detection before transcription
+- `--silence-threshold-dbfs <value>` set silence-gate threshold
 - `--duration <duration>` set fixed recording duration, e.g. `10s`
 - `--immediate` start recording immediately
+- `--no-progress` disable spinner/progress indicators
 - `--verbose` enable verbose logs
+- `--json` output logs in JSON format
 
-For all global flags, run `voxclip --help`.
+### Command-specific flags
+
+- `voxclip record --help` includes recording-only flags such as `--output`.
+- `voxclip transcribe --help` includes transcription/copy flags such as `--copy`.
+- `voxclip setup --help` includes model setup flags only.
+- `voxclip devices --help` has no operational flags.
 
 ## Recording Backends
 

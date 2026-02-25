@@ -69,5 +69,9 @@ func newSetupCmd(app *appState) *cobra.Command {
 		},
 	}
 
+	bindLoggingFlags(cmd, app)
+	bindProgressFlag(cmd, app)
+	bindModelFlags(cmd, app)
+
 	return cmd
 }

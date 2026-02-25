@@ -16,6 +16,7 @@ Initial development history before the first tagged release.
 ### Changed
 
 - `--input` flag help text updated with cross-platform examples (macOS, PipeWire, ALSA).
+- Flags are now strictly command-scoped; unsupported flags on a command now return an unknown-flag error instead of being silently accepted from inherited global flags.
 
 ### Previously added
 
