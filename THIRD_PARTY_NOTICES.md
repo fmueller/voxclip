@@ -24,6 +24,12 @@ When redistributing Voxclip binaries, include this file alongside the project's 
 - `github.com/stretchr/testify` (MIT)
 - `gopkg.in/yaml.v3` (MIT and Apache-2.0)
 
+## Test data assets
+
+- FSDD (Free Spoken Digit Dataset) sample WAV files in `testdata/audio/fsdd/` (CC BY-SA 4.0)
+  - Source: `https://github.com/Jakobovski/free-spoken-digit-dataset`
+  - License: `https://creativecommons.org/licenses/by-sa/4.0/`
+
 ## Notes
 
 - MIT, BSD-3-Clause, ISC, and Apache-2.0 are generally compatible with distribution in an Apache-2.0 project.

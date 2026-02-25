@@ -70,6 +70,53 @@ jobs:
       - name: Integration-tag tests
         run: go test -tags=integration ./...
 
+  e2e-transcribe:
+    needs: integration-test
+    runs-on: ubuntu-latest
+    env:
+      WHISPER_REF: v1.8.3
+      VOXCLIP_E2E_MODEL: tiny
+      VOXCLIP_E2E_MODEL_DIR: ${{ runner.temp }}/voxclip-models
+      VOXCLIP_E2E_WHISPER_PATH: ${{ github.workspace }}/packaging/whisper/linux_amd64/whisper-cli
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Restore whisper-cli cache
+        id: whisper-cache
+        uses: actions/cache@v4
+        with:
+          path: packaging/whisper/linux_amd64
+          key: whisper-${{ runner.os }}-${{ env.WHISPER_REF }}-${{ hashFiles('scripts/build-whisper-cli.sh') }}
+          restore-keys: |
+            whisper-${{ runner.os }}-${{ env.WHISPER_REF }}-
+
+      - name: Build whisper-cli
+        if: steps.whisper-cache.outputs.cache-hit != 'true'
+        run: ./scripts/build-whisper-cli.sh --ref "${WHISPER_REF}"
+
+      - name: Restore model cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.VOXCLIP_E2E_MODEL_DIR }}
+          key: voxclip-model-${{ runner.os }}-${{ env.VOXCLIP_E2E_MODEL }}-${{ hashFiles('internal/whisper/model.go') }}
+          restore-keys: |
+            voxclip-model-${{ runner.os }}-${{ env.VOXCLIP_E2E_MODEL }}-
+
+      - name: Warm tiny model cache
+        run: |
+          go run ./cmd/voxclip setup --model "${VOXCLIP_E2E_MODEL}" --model-dir "${VOXCLIP_E2E_MODEL_DIR}" --no-progress
+
+      - name: End-to-end transcription test
+        run: |
+          go test -tags=e2e ./internal/cli -run '^TestTranscribeEndToEndWithFSDD$' -count=1
+
   smoke-test:
     needs: integration-test
     runs-on: ubuntu-latest
