@@ -67,3 +67,10 @@ The workflow builds and stages `whisper-cli` for:
 - `darwin/arm64`
 
 It then runs GoReleaser to publish release archives and `checksums.txt`.
+
+Release delivery is via **GitHub Releases assets** (not GitHub Packages):
+
+- `voxclip_<version>_<os>_<arch>.tar.gz`
+- `checksums.txt`
+
+Each per-platform archive bundles both executables (`voxclip` and `libexec/whisper/whisper-cli`), so end-user installs do not compile `whisper.cpp` locally.
