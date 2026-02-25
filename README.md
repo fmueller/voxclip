@@ -51,6 +51,8 @@ The installer:
 - verifies archive integrity with `checksums.txt`
 - installs `voxclip` to `~/.local/bin` and whisper runtime to `~/.local/libexec/whisper/whisper-cli`
 
+Installer downloads come from **GitHub Releases assets** for the selected tag. The target machine does not build `whisper.cpp`; the release archive already contains a prebuilt `whisper-cli` binary.
+
 ### Manual install from release archive
 
 1. Download the matching archive for your OS/arch from [GitHub Releases](https://github.com/fmueller/voxclip/releases).

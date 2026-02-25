@@ -143,6 +143,32 @@ jobs:
           chmod +x packaging/whisper/darwin_amd64/whisper-cli
           chmod +x packaging/whisper/darwin_arm64/whisper-cli
 
+      - name: Verify staged whisper binaries
+        run: |
+          set -euo pipefail
+
+          targets=(
+            linux_amd64
+            linux_arm64
+            darwin_amd64
+            darwin_arm64
+          )
+
+          for target in "${targets[@]}"; do
+            whisper="packaging/whisper/${target}/whisper-cli"
+            if [[ ! -f "$whisper" ]]; then
+              echo "Missing staged whisper binary: $whisper" >&2
+              exit 1
+            fi
+            if [[ ! -x "$whisper" ]]; then
+              echo "Staged whisper binary is not executable: $whisper" >&2
+              exit 1
+            fi
+
+            echo "Validated $whisper"
+            file "$whisper"
+          done
+
       - name: Run GoReleaser (snapshot)
         if: github.event_name == 'workflow_dispatch'
         uses: goreleaser/goreleaser-action@v6
