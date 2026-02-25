@@ -55,15 +55,23 @@ func (b *pipewireBackend) Record(ctx context.Context, cfg Config) error {
 
 func (b *pipewireBackend) ListDevices(ctx context.Context) (string, error) {
 	if commandAvailable("pw-cli") {
-		return commandOutput(ctx, "pw-cli", "ls", "Node")
+		out, err := commandOutput(ctx, "pw-cli", "ls", "Node")
+		if err != nil {
+			return "", err
+		}
+		return trimLeadingWhitespacePerLine(out), nil
 	}
 
 	if out, err := commandOutput(ctx, "pw-record", "--list-targets"); err == nil {
-		return out, nil
+		return trimLeadingWhitespacePerLine(out), nil
 	}
 
 	if commandAvailable("pactl") {
-		return commandOutput(ctx, "pactl", "list", "short", "sources")
+		out, err := commandOutput(ctx, "pactl", "list", "short", "sources")
+		if err != nil {
+			return "", err
+		}
+		return trimLeadingWhitespacePerLine(out), nil
 	}
 
 	return "", errors.New("no pipewire device listing command available")
