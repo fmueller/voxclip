@@ -5,7 +5,6 @@ package cli
 import (
 	"bytes"
 	"context"
-	"encoding/binary"
 	"errors"
 	"os"
 	"path/filepath"
@@ -159,7 +158,7 @@ func TestRunDefaultCopiesBlankWhenCopyEmptyEnabled(t *testing.T) {
 
 func TestRunDefaultSkipsTranscribeWhenRecordingIsSilent(t *testing.T) {
 	path := filepath.Join(t.TempDir(), "silent.wav")
-	require.NoError(t, os.WriteFile(path, makePCM16WAVForIntegration(make([]int16, 16000), 16000, 1), 0o644))
+	require.NoError(t, os.WriteFile(path, makePCM16WAVForTest(make([]int16, 16000), 16000, 1), 0o644))
 
 	out := new(bytes.Buffer)
 	transcribeCalls := 0
@@ -240,50 +239,4 @@ func TestRunDefaultPreflightErrorAbortsBeforeRecording(t *testing.T) {
 	err := app.runDefault(context.Background())
 	require.Error(t, err)
 	require.False(t, recorded, "recording should not happen when preflight fails")
-}
-
-func makePCM16WAVForIntegration(samples []int16, sampleRate int, channels int) []byte {
-	bytesPerSample := 2
-	dataSize := len(samples) * bytesPerSample
-	fmtChunkSize := 16
-	riffSize := 4 + (8 + fmtChunkSize) + (8 + dataSize)
-
-	out := make([]byte, 12+8+fmtChunkSize+8+dataSize)
-	off := 0
-
-	copy(out[off:], []byte("RIFF"))
-	off += 4
-	binary.LittleEndian.PutUint32(out[off:], uint32(riffSize))
-	off += 4
-	copy(out[off:], []byte("WAVE"))
-	off += 4
-
-	copy(out[off:], []byte("fmt "))
-	off += 4
-	binary.LittleEndian.PutUint32(out[off:], uint32(fmtChunkSize))
-	off += 4
-	binary.LittleEndian.PutUint16(out[off:], 1)
-	off += 2
-	binary.LittleEndian.PutUint16(out[off:], uint16(channels))
-	off += 2
-	binary.LittleEndian.PutUint32(out[off:], uint32(sampleRate))
-	off += 4
-	binary.LittleEndian.PutUint32(out[off:], uint32(sampleRate*channels*bytesPerSample))
-	off += 4
-	binary.LittleEndian.PutUint16(out[off:], uint16(channels*bytesPerSample))
-	off += 2
-	binary.LittleEndian.PutUint16(out[off:], 16)
-	off += 2
-
-	copy(out[off:], []byte("data"))
-	off += 4
-	binary.LittleEndian.PutUint32(out[off:], uint32(dataSize))
-	off += 4
-
-	for _, s := range samples {
-		binary.LittleEndian.PutUint16(out[off:], uint16(s))
-		off += 2
-	}
-
-	return out
 }
