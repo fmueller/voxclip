@@ -207,3 +207,25 @@ jobs:
 
       - name: Check dependency licenses
         run: go-licenses check ./cmd/voxclip --allowed_licenses=Apache-2.0,MIT,BSD-3-Clause,ISC
+
+  installer-test:
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [ubuntu-latest, ubuntu-24.04-arm, macos-latest]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Install bats
+        run: |
+          if [[ "$RUNNER_OS" == "Linux" ]]; then
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq bats
+          else
+            brew install bats-core
+          fi
+
+      - name: Run installer tests
+        run: bats scripts/install-voxclip_test.bats

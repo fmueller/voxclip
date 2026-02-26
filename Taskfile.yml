@@ -31,6 +31,11 @@ tasks:
     cmds:
       - go test -tags=e2e ./internal/cli -run '^TestTranscribeEndToEndWithFSDD$' -count=1
 
+  test:installer:
+    desc: Run installer script bats tests
+    cmds:
+      - bats scripts/install-voxclip_test.bats
+
   test:mutate:
     desc: Run mutation testing with gremlins
     cmds:
