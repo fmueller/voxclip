@@ -171,7 +171,7 @@ jobs:
 
       - name: Run GoReleaser (snapshot)
         if: github.event_name == 'workflow_dispatch'
-        uses: goreleaser/goreleaser-action@v6
+        uses: goreleaser/goreleaser-action@v7
         with:
           distribution: goreleaser
           version: '~> v2'
@@ -181,7 +181,7 @@ jobs:
 
       - name: Run GoReleaser (tag release)
         if: github.event_name == 'push'
-        uses: goreleaser/goreleaser-action@v6
+        uses: goreleaser/goreleaser-action@v7
         with:
           distribution: goreleaser
           version: '~> v2'
