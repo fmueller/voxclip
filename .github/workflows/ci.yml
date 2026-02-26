@@ -147,9 +147,9 @@ jobs:
         run: |
           go run ./cmd/voxclip setup --model "${VOXCLIP_E2E_MODEL}" --model-dir "${VOXCLIP_E2E_MODEL_DIR}" --no-progress
 
-      - name: End-to-end transcription test
+      - name: End-to-end transcription tests
         run: |
-          go test -tags=e2e ./internal/cli -run '^TestTranscribeEndToEndWithFSDD$' -count=1
+          go test -tags=e2e ./internal/cli -count=1
 
   mutation-tests:
     needs: unit-tests
