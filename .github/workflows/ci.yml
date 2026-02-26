@@ -64,7 +64,7 @@ jobs:
           version: '~> v2'
           args: check
 
-  unit-test:
+  unit-tests:
     needs: checks
     runs-on: ${{ matrix.runner }}
     strategy:
@@ -84,8 +84,8 @@ jobs:
       - name: Unit tests
         run: go test ./...
 
-  integration-test:
-    needs: unit-test
+  integration-tests:
+    needs: unit-tests
     runs-on: ${{ matrix.runner }}
     strategy:
       fail-fast: false
@@ -104,8 +104,8 @@ jobs:
       - name: Integration-tag tests
         run: go test -tags=integration ./...
 
-  e2e:
-    needs: integration-test
+  e2e-tests:
+    needs: integration-tests
     runs-on: ubuntu-latest
     env:
       WHISPER_REF: v1.8.3
@@ -151,8 +151,8 @@ jobs:
         run: |
           go test -tags=e2e ./internal/cli -run '^TestTranscribeEndToEndWithFSDD$' -count=1
 
-  mutation-test:
-    needs: unit-test
+  mutation-tests:
+    needs: unit-tests
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -170,7 +170,7 @@ jobs:
       - name: Run mutation tests
         run: gremlins unleash --threshold-efficacy 0.25
 
-  installer-test:
+  installer-tests:
     needs: checks
     runs-on: ${{ matrix.runner }}
     strategy:
