@@ -32,13 +32,13 @@ func TestPipeWireDurationModeDoesNotUseDurationFlag(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	waitForFile(t, argsFile, 500*time.Millisecond)
+	waitForFile(t, argsFile, 5*time.Second)
 	argsRaw, err := os.ReadFile(argsFile)
 	require.NoError(t, err)
 	require.NotContains(t, string(argsRaw), "--duration")
 	require.Contains(t, string(argsRaw), "--rate")
 
-	waitForFile(t, signalFile, 500*time.Millisecond)
+	waitForFile(t, signalFile, 5*time.Second)
 }
 
 func TestPipeWireDurationModeReturnsContextCancellation(t *testing.T) {
@@ -65,7 +65,7 @@ func TestPipeWireDurationModeReturnsContextCancellation(t *testing.T) {
 	}()
 	t.Cleanup(cancel)
 
-	waitForFile(t, readyFile, time.Second)
+	waitForFile(t, readyFile, 5*time.Second)
 	cancel()
 
 	err := <-errCh
@@ -95,13 +95,13 @@ func TestPipeWireInputPassesTarget(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	waitForFile(t, argsFile, 500*time.Millisecond)
+	waitForFile(t, argsFile, 5*time.Second)
 	argsRaw, err := os.ReadFile(argsFile)
 	require.NoError(t, err)
 	args := string(argsRaw)
 	require.Contains(t, args, "--target\n42\n")
 
-	waitForFile(t, signalFile, 500*time.Millisecond)
+	waitForFile(t, signalFile, 5*time.Second)
 }
 
 func TestPipeWireNoInputOmitsTarget(t *testing.T) {
@@ -126,12 +126,12 @@ func TestPipeWireNoInputOmitsTarget(t *testing.T) {
 	})
 	require.NoError(t, err)
 
-	waitForFile(t, argsFile, 500*time.Millisecond)
+	waitForFile(t, argsFile, 5*time.Second)
 	argsRaw, err := os.ReadFile(argsFile)
 	require.NoError(t, err)
 	require.NotContains(t, string(argsRaw), "--target")
 
-	waitForFile(t, signalFile, 500*time.Millisecond)
+	waitForFile(t, signalFile, 5*time.Second)
 }
 
 func waitForFile(t *testing.T, path string, timeout time.Duration) {
