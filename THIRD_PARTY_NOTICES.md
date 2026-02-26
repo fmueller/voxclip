@@ -1,11 +1,14 @@
 # Third-Party Notices
 
-This project is licensed under Apache License 2.0. Voxclip depends on third-party libraries with permissive licenses that are compatible with Apache-2.0.
+This project is licensed under Apache License 2.0. Voxclip depends on third-party libraries and tools whose licenses are compatible with Apache-2.0. This file is included in release archives to satisfy notice-preservation requirements of those licenses.
 
-When redistributing Voxclip binaries, include this file alongside the project's `LICENSE` file.
+## Bundled binary: whisper.cpp
 
-## Runtime dependencies (linked into `voxclip` binary)
+Release archives include a prebuilt `whisper-cli` binary compiled from [whisper.cpp](https://github.com/ggml-org/whisper.cpp) (MIT).
 
+## Runtime dependencies (compiled into `voxclip` binary)
+
+- `github.com/inconshreveable/mousetrap` (Apache-2.0)
 - `github.com/mitchellh/colorstring` (MIT)
 - `github.com/rivo/uniseg` (MIT)
 - `github.com/schollz/progressbar/v3` (MIT)
@@ -19,7 +22,6 @@ When redistributing Voxclip binaries, include this file alongside the project's 
 ## Development and test-only dependencies
 
 - `github.com/davecgh/go-spew` (ISC)
-- `github.com/inconshreveable/mousetrap` (Apache-2.0)
 - `github.com/pmezard/go-difflib` (BSD-3-Clause)
 - `github.com/stretchr/testify` (MIT)
 - `gopkg.in/yaml.v3` (MIT and Apache-2.0)
@@ -33,5 +35,5 @@ When redistributing Voxclip binaries, include this file alongside the project's 
 ## Notes
 
 - MIT, BSD-3-Clause, ISC, and Apache-2.0 are generally compatible with distribution in an Apache-2.0 project.
-- Some licenses require preservation of copyright and license notices in source and/or binary redistributions. This file is provided to satisfy notice-preservation expectations.
-- For any future dependency changes, rerun a license audit before release.
+- Some licenses require preservation of copyright and license notices in source and binary redistributions.
+- For dependency changes, review licenses before release.
