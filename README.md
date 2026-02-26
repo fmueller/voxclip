@@ -176,7 +176,7 @@ libexec/whisper/whisper-cli
 
 ## Examples
 
-For voice-prompt workflows with terminal coding agents (interactive sessions, hotkey auto-paste, and one-shot invocation), see `examples/README.md`.
+For voice-prompt workflows with terminal coding agents and voice notes, see `examples/README.md`.
 
 ## Development
 
