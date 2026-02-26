@@ -72,6 +72,10 @@ Use these defaults unless a task requires otherwise.
 - Syntax check: `bash -n scripts/install-voxclip.sh`
 - Help command: `./scripts/install-voxclip.sh --help`
 
+### License compliance check used in CI
+- Check allowed licenses: `go-licenses check ./cmd/voxclip --allowed_licenses=Apache-2.0,MIT,BSD-3-Clause,ISC`
+- Install go-licenses: `go install github.com/google/go-licenses/v2@v2.0.1`
+
 ### Release-related commands
 - Build bundled whisper binary for current host: `./scripts/build-whisper-cli.sh`
 - Task wrapper: `task whisper:build`

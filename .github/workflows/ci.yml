@@ -181,3 +181,21 @@ jobs:
           distribution: goreleaser
           version: '~> v2'
           args: check
+
+  license-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Install go-licenses
+        run: go install github.com/google/go-licenses/v2@v2.0.1
+
+      - name: Check dependency licenses
+        run: go-licenses check ./cmd/voxclip --allowed_licenses=Apache-2.0,MIT,BSD-3-Clause,ISC
