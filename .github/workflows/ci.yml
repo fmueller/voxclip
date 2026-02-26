@@ -14,7 +14,7 @@ permissions:
   contents: read
 
 jobs:
-  lint:
+  checks:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -38,8 +38,34 @@ jobs:
       - name: Vet
         run: go vet ./...
 
+      - name: Install go-licenses
+        run: go install github.com/google/go-licenses/v2@v2.0.1
+
+      - name: Check dependency licenses
+        run: go-licenses check ./cmd/voxclip --allowed_licenses=Apache-2.0,MIT,BSD-3-Clause,ISC
+
+      - name: CLI help smoke test
+        run: |
+          go run ./cmd/voxclip --help
+          go run ./cmd/voxclip setup --help
+          go run ./cmd/voxclip record --help
+          go run ./cmd/voxclip transcribe --help
+          go run ./cmd/voxclip devices --help
+
+      - name: Installer script syntax check
+        run: |
+          bash -n scripts/install-voxclip.sh
+          ./scripts/install-voxclip.sh --help
+
+      - name: Validate GoReleaser config
+        uses: goreleaser/goreleaser-action@v6
+        with:
+          distribution: goreleaser
+          version: '~> v2'
+          args: check
+
   unit-test:
-    needs: lint
+    needs: checks
     runs-on: ${{ matrix.runner }}
     strategy:
       fail-fast: false
@@ -78,7 +104,7 @@ jobs:
       - name: Integration-tag tests
         run: go test -tags=integration ./...
 
-  e2e-transcribe:
+  e2e:
     needs: integration-test
     runs-on: ubuntu-latest
     env:
@@ -144,71 +170,8 @@ jobs:
       - name: Run mutation tests
         run: gremlins unleash --threshold-efficacy 0.25
 
-  smoke-test:
-    needs: integration-test
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-
-      - name: Setup Go
-        uses: actions/setup-go@v6
-        with:
-          go-version-file: go.mod
-          cache: true
-
-      - name: CLI help smoke test
-        run: |
-          go run ./cmd/voxclip --help
-          go run ./cmd/voxclip setup --help
-          go run ./cmd/voxclip record --help
-          go run ./cmd/voxclip transcribe --help
-          go run ./cmd/voxclip devices --help
-
-      - name: Installer script syntax check
-        run: |
-          bash -n scripts/install-voxclip.sh
-          ./scripts/install-voxclip.sh --help
-
-  goreleaser-config:
-    needs: integration-test
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-
-      - name: Setup Go
-        uses: actions/setup-go@v6
-        with:
-          go-version-file: go.mod
-          cache: true
-
-      - name: Validate GoReleaser config
-        uses: goreleaser/goreleaser-action@v6
-        with:
-          distribution: goreleaser
-          version: '~> v2'
-          args: check
-
-  license-check:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v6
-
-      - name: Setup Go
-        uses: actions/setup-go@v6
-        with:
-          go-version-file: go.mod
-          cache: true
-
-      - name: Install go-licenses
-        run: go install github.com/google/go-licenses/v2@v2.0.1
-
-      - name: Check dependency licenses
-        run: go-licenses check ./cmd/voxclip --allowed_licenses=Apache-2.0,MIT,BSD-3-Clause,ISC
-
   installer-test:
+    needs: checks
     runs-on: ${{ matrix.runner }}
     strategy:
       fail-fast: false
