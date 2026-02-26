@@ -15,7 +15,10 @@ set -e
 
 export PATH="$HOME/.local/bin:/opt/homebrew/bin:/usr/local/bin:$PATH"
 
-voxclip --duration "${VPROMPT_DURATION:-8s}" --no-progress 2>/dev/null
+voxclip --duration "${VPROMPT_DURATION:-8s}" --no-progress 2>/dev/null || {
+  echo "vpaste: recording failed; is voxclip installed?" >&2
+  exit 1
+}
 
 case "$(uname -s)" in
   Darwin)

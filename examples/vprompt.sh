@@ -8,5 +8,8 @@
 #   export VPROMPT_DURATION=15s
 
 vprompt() {
-  voxclip --no-progress --duration "${VPROMPT_DURATION:-10s}" 2>/dev/null
+  voxclip --no-progress --duration "${VPROMPT_DURATION:-10s}" 2>/dev/null || {
+    echo "vprompt: recording failed; is voxclip installed?" >&2
+    return 1
+  }
 }

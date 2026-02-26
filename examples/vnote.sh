@@ -10,6 +10,9 @@
 
 NOTES_FILE="${VNOTE_FILE:-$HOME/voice-notes.txt}"
 
-text=$(voxclip --no-progress --duration "${VNOTE_DURATION:-15s}" 2>/dev/null)
+text=$(voxclip --no-progress --duration "${VNOTE_DURATION:-15s}" 2>/dev/null) || {
+  echo "vnote: recording failed; is voxclip installed?" >&2
+  exit 1
+}
 
 [ -n "$text" ] && printf '%s  %s\n' "$(date '+%Y-%m-%d %H:%M')" "$text" >> "$NOTES_FILE"
