@@ -124,7 +124,7 @@ jobs:
 
       - name: Restore whisper-cli cache
         id: whisper-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: packaging/whisper/linux_amd64
           key: whisper-${{ runner.os }}-${{ env.WHISPER_REF }}-${{ hashFiles('scripts/build-whisper-cli.sh') }}
@@ -136,7 +136,7 @@ jobs:
         run: ./scripts/build-whisper-cli.sh --ref "${WHISPER_REF}"
 
       - name: Restore model cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ${{ env.VOXCLIP_E2E_MODEL_DIR }}
           key: voxclip-model-${{ runner.os }}-${{ env.VOXCLIP_E2E_MODEL }}-${{ hashFiles('internal/whisper/model.go') }}
