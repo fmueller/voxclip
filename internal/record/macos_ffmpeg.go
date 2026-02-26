@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -71,5 +72,11 @@ func (b *ffmpegMacBackend) Record(ctx context.Context, cfg Config) error {
 }
 
 func (b *ffmpegMacBackend) ListDevices(ctx context.Context) (string, error) {
-	return commandOutput(ctx, "ffmpeg", "-hide_banner", "-f", "avfoundation", "-list_devices", "true", "-i", "")
+	cmd := exec.CommandContext(ctx, "ffmpeg", "-hide_banner", "-f", "avfoundation", "-list_devices", "true", "-i", "")
+	out, _ := cmd.CombinedOutput()
+	trimmed := strings.TrimSpace(string(out))
+	if trimmed == "" {
+		return "", fmt.Errorf("ffmpeg returned no device output")
+	}
+	return trimmed, nil
 }
