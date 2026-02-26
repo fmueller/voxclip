@@ -36,4 +36,4 @@ Release archives include a prebuilt `whisper-cli` binary compiled from [whisper.
 
 - MIT, BSD-3-Clause, ISC, and Apache-2.0 are generally compatible with distribution in an Apache-2.0 project.
 - Some licenses require preservation of copyright and license notices in source and binary redistributions.
-- For dependency changes, review licenses before release.
+- For dependency changes, CI checks licenses automatically via `go-licenses`.
