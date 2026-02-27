@@ -100,7 +100,7 @@ cmake -S "$TMP_DIR/whisper.cpp" -B "$TMP_DIR/whisper.cpp/build" \
   -DCMAKE_BUILD_TYPE=Release \
   -DBUILD_SHARED_LIBS=OFF \
   -DGGML_OPENMP=OFF \
-  "${EXTRA_CMAKE_FLAGS[@]}"
+  ${EXTRA_CMAKE_FLAGS[@]+"${EXTRA_CMAKE_FLAGS[@]}"}
 cmake --build "$TMP_DIR/whisper.cpp/build" --config Release --target whisper-cli -j "$(getconf _NPROCESSORS_ONLN 2>/dev/null || echo 4)"
 
 SRC_FILE=""
