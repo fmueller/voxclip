@@ -54,7 +54,7 @@ jobs:
 
       - name: Installer script syntax check
         run: |
-          bash -n scripts/install-voxclip.sh
+          sh -n scripts/install-voxclip.sh
           ./scripts/install-voxclip.sh --help
 
       - name: Validate GoReleaser config

@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 usage() {
   cat <<'HELP'
@@ -87,14 +87,14 @@ install_file() {
 }
 
 main() {
-  set -euo pipefail
+  set -eu
 
   local REPO="fmueller/voxclip"
   local VERSION=""
   local PREFIX="${HOME}/.local"
   local BIN_DIR=""
 
-  while [[ $# -gt 0 ]]; do
+  while [ $# -gt 0 ]; do
     case "$1" in
       --version)
         VERSION="$2"
@@ -120,7 +120,7 @@ main() {
     esac
   done
 
-  if [[ -z "$BIN_DIR" ]]; then
+  if [ -z "$BIN_DIR" ]; then
     BIN_DIR="${PREFIX}/bin"
   fi
 
@@ -141,11 +141,11 @@ main() {
   OS="$(detect_os)"
   ARCH="$(detect_arch)"
 
-  if [[ -z "$VERSION" ]]; then
+  if [ -z "$VERSION" ]; then
     VERSION="$(latest_tag)"
   fi
 
-  if [[ -z "$VERSION" ]]; then
+  if [ -z "$VERSION" ]; then
     echo "Could not determine release version" >&2
     exit 1
   fi
@@ -169,14 +169,14 @@ main() {
 
   local expected_sha
   expected_sha="$(grep " ${ARTIFACT}$" "${TMP_DIR}/${CHECKSUMS}" | awk '{print $1}')"
-  if [[ -z "$expected_sha" ]]; then
+  if [ -z "$expected_sha" ]; then
     echo "Checksum for ${ARTIFACT} not found in ${CHECKSUMS}" >&2
     exit 1
   fi
 
   local actual_sha
   actual_sha="$(sha256_file "${TMP_DIR}/${ARTIFACT}")"
-  if [[ "$expected_sha" != "$actual_sha" ]]; then
+  if [ "$expected_sha" != "$actual_sha" ]; then
     echo "Checksum mismatch for ${ARTIFACT}" >&2
     echo "Expected: ${expected_sha}" >&2
     echo "Actual:   ${actual_sha}" >&2
@@ -186,11 +186,11 @@ main() {
   mkdir -p "${TMP_DIR}/extract"
   tar -xzf "${TMP_DIR}/${ARTIFACT}" -C "${TMP_DIR}/extract"
 
-  if [[ ! -f "${TMP_DIR}/extract/voxclip" ]]; then
+  if [ ! -f "${TMP_DIR}/extract/voxclip" ]; then
     echo "Archive is missing voxclip binary" >&2
     exit 1
   fi
-  if [[ ! -f "${TMP_DIR}/extract/libexec/whisper/whisper-cli" ]]; then
+  if [ ! -f "${TMP_DIR}/extract/libexec/whisper/whisper-cli" ]; then
     echo "Archive is missing bundled whisper engine at libexec/whisper/whisper-cli" >&2
     exit 1
   fi
@@ -209,13 +209,16 @@ main() {
   echo "  voxclip devices"
   echo "  voxclip"
 
-  if [[ ":$PATH:" != *":${BIN_DIR}:"* ]]; then
-    echo ""
-    echo "Add this to your shell profile if needed:"
-    echo "  export PATH=\"${BIN_DIR}:\$PATH\""
-  fi
+  case ":$PATH:" in
+    *":${BIN_DIR}:"*) ;;
+    *)
+      echo ""
+      echo "Add this to your shell profile if needed:"
+      echo "  export PATH=\"${BIN_DIR}:\$PATH\""
+      ;;
+  esac
 }
 
-if [[ "${_VOXCLIP_TESTING:-}" != "1" ]]; then
+if [ "${_VOXCLIP_TESTING:-}" != "1" ]; then
   main "$@"
 fi
