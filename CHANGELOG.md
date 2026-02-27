@@ -7,9 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-02-27
+
 ### Fixed
 
 - Bundled whisper-cli no longer crashes with "illegal instruction" on CPUs without AVX/AVX2 support.
+- Install script now works on systems where `/bin/sh` is not Bash (e.g., Debian/Ubuntu with dash).
+- Install script no longer prints a spurious "parameter not set" error after successful installation.
 
 ## [1.0.0] - 2026-02-26
 
@@ -36,4 +40,5 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - PipeWire duration recording no longer depends on `pw-record --duration`; voxclip now stops timed recordings itself for broader version compatibility.
 - Release archives now include `THIRD_PARTY_NOTICES.md` to document dependency licenses for redistribution.
 
+[1.0.1]: https://github.com/fmueller/voxclip/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/fmueller/voxclip/releases/tag/v1.0.0
