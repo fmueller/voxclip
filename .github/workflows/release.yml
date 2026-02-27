@@ -49,43 +49,8 @@ jobs:
       - name: Build whisper-cli
         shell: bash
         run: |
-          set -euo pipefail
-          tmpdir="$(mktemp -d)"
-          trap 'rm -rf "$tmpdir"' EXIT
-
-          git clone --depth 1 --branch "$WHISPER_REF" https://github.com/ggml-org/whisper.cpp.git "$tmpdir/whisper.cpp"
-          cmake -S "$tmpdir/whisper.cpp" -B "$tmpdir/whisper.cpp/build" \
-            -DCMAKE_BUILD_TYPE=Release \
-            -DBUILD_SHARED_LIBS=OFF \
-            -DGGML_OPENMP=OFF
-          cmake --build "$tmpdir/whisper.cpp/build" --config Release --target whisper-cli -j 4
-
-          if [[ -f "$tmpdir/whisper.cpp/build/bin/whisper-cli" ]]; then
-            cp "$tmpdir/whisper.cpp/build/bin/whisper-cli" whisper-cli
-          elif [[ -f "$tmpdir/whisper.cpp/build/src/whisper-cli" ]]; then
-            cp "$tmpdir/whisper.cpp/build/src/whisper-cli" whisper-cli
-          else
-            echo "Could not locate whisper-cli build output" >&2
-            exit 1
-          fi
-
-          chmod +x whisper-cli
-
-          if [[ "${{ matrix.goos }}" == "linux" ]]; then
-            if ldd whisper-cli | grep -E 'libwhisper|libggml' >/dev/null 2>&1; then
-              echo "whisper-cli still links against libwhisper/libggml; expected static linkage" >&2
-              ldd whisper-cli >&2
-              exit 1
-            fi
-          fi
-
-          if [[ "${{ matrix.goos }}" == "darwin" ]]; then
-            if otool -L whisper-cli | grep -E 'libwhisper|libggml' >/dev/null 2>&1; then
-              echo "whisper-cli still links against libwhisper/libggml; expected static linkage" >&2
-              otool -L whisper-cli >&2
-              exit 1
-            fi
-          fi
+          scripts/build-whisper-cli.sh
+          cp "packaging/whisper/${{ matrix.goos }}_${{ matrix.goarch }}/whisper-cli" whisper-cli
 
       - name: Upload whisper artifact
         uses: actions/upload-artifact@v7

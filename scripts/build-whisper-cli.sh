@@ -82,10 +82,25 @@ trap cleanup EXIT
 echo "Building whisper-cli (${WHISPER_REF}) for ${OS}/${ARCH}"
 git clone --depth 1 --branch "$WHISPER_REF" https://github.com/ggml-org/whisper.cpp.git "$TMP_DIR/whisper.cpp"
 
+EXTRA_CMAKE_FLAGS=()
+if [[ "$ARCH" == "amd64" ]]; then
+  EXTRA_CMAKE_FLAGS=(
+    -DGGML_NATIVE=OFF
+    -DGGML_AVX=OFF
+    -DGGML_AVX2=OFF
+    -DGGML_AVX512=OFF
+    -DGGML_AVX512_VBMI=OFF
+    -DGGML_AVX512_VNNI=OFF
+    -DGGML_FMA=OFF
+    -DGGML_F16C=OFF
+  )
+fi
+
 cmake -S "$TMP_DIR/whisper.cpp" -B "$TMP_DIR/whisper.cpp/build" \
   -DCMAKE_BUILD_TYPE=Release \
   -DBUILD_SHARED_LIBS=OFF \
-  -DGGML_OPENMP=OFF
+  -DGGML_OPENMP=OFF \
+  "${EXTRA_CMAKE_FLAGS[@]}"
 cmake --build "$TMP_DIR/whisper.cpp/build" --config Release --target whisper-cli -j "$(getconf _NPROCESSORS_ONLN 2>/dev/null || echo 4)"
 
 SRC_FILE=""
