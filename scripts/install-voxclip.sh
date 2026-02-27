@@ -155,7 +155,6 @@ main() {
   local CHECKSUMS="checksums.txt"
   local BASE_URL="https://github.com/${REPO}/releases/download/${VERSION}"
 
-  local TMP_DIR
   TMP_DIR="$(mktemp -d)"
   cleanup() {
     rm -rf "$TMP_DIR"
