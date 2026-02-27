@@ -100,6 +100,11 @@ func (b *BundledEngine) Transcribe(ctx context.Context, req TranscriptionRequest
 		if isMissingSharedLibraryError(errText) {
 			return "", fmt.Errorf("bundled whisper engine at %s is missing required shared libraries (%s); reinstall Voxclip from an official release or rebuild whisper-cli with BUILD_SHARED_LIBS=OFF", b.Executable, errText)
 		}
+		if isIllegalInstructionError(errText) || isIllegalInstructionError(err.Error()) {
+			return "", fmt.Errorf("bundled whisper engine crashed with an illegal CPU instruction; " +
+				"your CPU may lack required instruction set extensions; " +
+				"set VOXCLIP_WHISPER_PATH to a whisper-cli binary built for your CPU")
+		}
 		return "", fmt.Errorf("whisper transcribe failed: %w (%s)", err, errText)
 	}
 
@@ -159,6 +164,10 @@ func isMissingSharedLibraryError(stderr string) bool {
 	}
 
 	return false
+}
+
+func isIllegalInstructionError(stderr string) bool {
+	return strings.Contains(strings.ToLower(stderr), "illegal instruction")
 }
 
 func normalizeArch(arch string) string {

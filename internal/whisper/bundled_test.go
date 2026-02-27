@@ -66,3 +66,12 @@ func TestIsMissingSharedLibraryError(t *testing.T) {
 	require.True(t, isMissingSharedLibraryError("dyld: Library not loaded: @rpath/libwhisper.dylib"))
 	require.False(t, isMissingSharedLibraryError("some other runtime error"))
 }
+
+func TestIsIllegalInstructionError(t *testing.T) {
+	t.Parallel()
+
+	require.True(t, isIllegalInstructionError("signal: illegal instruction (core dumped)"))
+	require.True(t, isIllegalInstructionError("signal: illegal instruction"))
+	require.False(t, isIllegalInstructionError("some other runtime error"))
+	require.False(t, isIllegalInstructionError(""))
+}
