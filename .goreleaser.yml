@@ -46,3 +46,27 @@ checksum:
 
 changelog:
   use: git
+
+brews:
+  - name: voxclip
+    ids:
+      - voxclip
+    repository:
+      owner: fmueller
+      name: homebrew-tap
+      branch: main
+      token: "{{ .Env.HOMEBREW_TAP_TOKEN }}"
+    directory: Formula
+    homepage: "https://github.com/fmueller/voxclip"
+    description: "Voice capture and transcription CLI — record, transcribe, and copy to clipboard locally"
+    license: "MIT"
+    skip_upload: auto
+    dependencies:
+      - name: ffmpeg
+        os: mac
+    install: |
+      bin.install "voxclip"
+      (libexec/"whisper").mkpath
+      (libexec/"whisper").install "libexec/whisper/whisper-cli"
+    test: |
+      system bin/"voxclip", "--version"
