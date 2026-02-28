@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Homebrew tap support: `brew tap fmueller/tap && brew install voxclip`.
 - `--pid-file` flag for toggle-style keyboard shortcut workflows: press a hotkey to start recording, press again to stop, then transcribe and paste automatically.
 - `--duration` now works alongside `--pid-file` as a safety timeout — recording stops on whichever comes first (signal or duration).
 - `--copy-newline` flag to append a trailing newline to the clipboard text.
