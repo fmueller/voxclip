@@ -74,3 +74,17 @@ Release delivery is via **GitHub Releases assets** (not GitHub Packages):
 - `checksums.txt`
 
 Each per-platform archive bundles both executables (`voxclip` and `libexec/whisper/whisper-cli`), so end-user installs do not compile `whisper.cpp` locally.
+
+## Homebrew tap publishing
+
+Releases automatically update the Homebrew formula in `fmueller/homebrew-tap` via GoReleaser's `brews:` stanza.
+
+### Required secret
+
+Add a GitHub secret named `HOMEBREW_TAP_TOKEN` to the `fmueller/voxclip` repository:
+
+1. Create a fine-grained PAT at **GitHub Settings > Developer Settings > Fine-grained tokens**.
+2. Scope it to `fmueller/homebrew-tap` with **Contents: Read and write** permission.
+3. Add it as a repository secret in **Settings > Secrets and variables > Actions**.
+
+Prerelease tags (containing a hyphen) skip the tap update (`skip_upload: auto`).
