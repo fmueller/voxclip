@@ -42,6 +42,7 @@ func newRecordCmd(app *appState) *cobra.Command {
 	cmd.Flags().DurationVar(&opts.duration, "duration", 0, "Record duration, e.g. 6s; 0 means interactive start/stop")
 	cmd.Flags().StringVar(&opts.output, "output", "", "Output WAV file path")
 	cmd.Flags().BoolVar(&app.immediate, "immediate", false, "Start recording immediately without waiting for Enter")
+	cmd.Flags().StringVar(&app.pidFile, "pid-file", "", "Write PID to file and wait for SIGUSR1 to stop recording")
 
 	return cmd
 }
@@ -53,6 +54,10 @@ func (a *appState) recordAudio(ctx context.Context, opts recordOptions) (string,
 	}
 
 	interactive := opts.duration <= 0
+	if a.pidFile != "" {
+		interactive = false
+	}
+
 	if interactive && !a.immediate {
 		if err := record.WaitForEnter(os.Stdin, os.Stderr, "Press Enter to start recording."); err != nil {
 			return "", err
@@ -61,7 +66,9 @@ func (a *appState) recordAudio(ctx context.Context, opts recordOptions) (string,
 
 	a.log().Info("recording started", zap.String("backend", a.backend), zap.String("output", outPath))
 	stopProgress := func() {}
-	if interactive {
+	if a.pidFile != "" {
+		stopProgress = startSpinner(a.progressEnabled(), "Recording")
+	} else if interactive {
 		stopProgress = startSpinner(a.progressEnabled(), "Recording")
 	} else {
 		stopProgress = startDurationProgress(a.progressEnabled(), "Recording", opts.duration)
@@ -77,6 +84,19 @@ func (a *appState) recordAudio(ctx context.Context, opts recordOptions) (string,
 		Input:       opts.input,
 		Format:      opts.format,
 		Logger:      a.log(),
+	}
+
+	if a.pidFile != "" {
+		stopCh := make(chan struct{})
+		cleanup := registerStopSignal(stopCh, a.log())
+		defer cleanup()
+
+		if err := writePIDFile(a.pidFile); err != nil {
+			return "", fmt.Errorf("write pid file: %w", err)
+		}
+		defer removePIDFile(a.pidFile, a.log())
+
+		recConfig.StopCh = stopCh
 	}
 
 	backendName, err := record.RecordWithFallback(ctx, a.backend, recConfig)

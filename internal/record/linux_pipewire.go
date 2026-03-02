@@ -39,15 +39,17 @@ func (b *pipewireBackend) Record(ctx context.Context, cfg Config) error {
 	args = append(args, cfg.OutputPath)
 
 	var cmd *exec.Cmd
-	if cfg.Interactive {
-		cmd = exec.CommandContext(ctx, "pw-record", args...)
-	} else if cfg.Duration > 0 {
+	if cfg.StopCh != nil || cfg.Duration > 0 {
 		cmd = exec.Command("pw-record", args...)
 	} else {
 		cmd = exec.CommandContext(ctx, "pw-record", args...)
 	}
 	cmd.Stdout = os.Stderr
 	cmd.Stderr = os.Stderr
+
+	if cfg.StopCh != nil {
+		return runSignalStopCommand(ctx, cmd, cfg.StopCh, cfg.Logger)
+	}
 
 	if cfg.Interactive {
 		return runInteractiveCommand(ctx, cmd, cfg.Logger)

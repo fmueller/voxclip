@@ -30,6 +30,7 @@ type Config struct {
 	Channels    int
 	Input       string
 	Format      string
+	StopCh      <-chan struct{}
 	Logger      *zap.Logger
 }
 
@@ -276,6 +277,65 @@ func runTimedCommand(ctx context.Context, cmd *exec.Cmd, duration time.Duration,
 
 			if stopSignalSent {
 				logger.Debug("recording process exited after timed stop signal", zap.Error(err))
+				return nil
+			}
+
+			var exitErr *exec.ExitError
+			if errors.As(err, &exitErr) {
+				if status, ok := exitErr.Sys().(syscall.WaitStatus); ok {
+					if status.Signaled() {
+						logger.Debug("recording process stopped by signal", zap.String("signal", status.Signal().String()))
+						return nil
+					}
+				}
+			}
+
+			return err
+		case <-ctx.Done():
+			_ = signalInterrupt(cmd.Process)
+			if _, exited := waitForDone(done, timedStopGracePeriod); !exited {
+				logger.Debug("recording process did not exit after context cancellation; killing")
+				_ = cmd.Process.Kill()
+				<-done
+			}
+			return ctx.Err()
+		}
+	}
+}
+
+func runSignalStopCommand(ctx context.Context, cmd *exec.Cmd, stopCh <-chan struct{}, logger *zap.Logger) error {
+	if logger == nil {
+		logger = zap.NewNop()
+	}
+
+	if err := cmd.Start(); err != nil {
+		return err
+	}
+
+	done := make(chan error, 1)
+	go func() {
+		done <- cmd.Wait()
+	}()
+
+	for {
+		select {
+		case err := <-done:
+			return err
+		case <-stopCh:
+			stopSignalSent := signalInterrupt(cmd.Process)
+			err, exited := waitForDone(done, timedStopGracePeriod)
+			if !exited {
+				logger.Debug("recording process did not exit after stop signal; killing")
+				_ = cmd.Process.Kill()
+				err = <-done
+			}
+
+			if err == nil {
+				return nil
+			}
+
+			if stopSignalSent {
+				logger.Debug("recording process exited after stop signal", zap.Error(err))
 				return nil
 			}
 

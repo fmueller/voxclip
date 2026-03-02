@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `--pid-file` flag for toggle-style keyboard shortcut workflows: press a hotkey to start recording, press again to stop, then transcribe and paste automatically.
+- `vpaste-toggle.sh` example script for binding voxclip to a single toggle hotkey.
+
 ## [1.0.1] - 2026-02-27
 
 ### Fixed
