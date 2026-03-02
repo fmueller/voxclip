@@ -112,6 +112,160 @@ func TestRunTimedCommandKillsOnTimerWhenInterruptIgnored(t *testing.T) {
 	require.NoError(t, err)
 }
 
+func TestRunSignalStopCommandStopsOnChannel(t *testing.T) {
+	tempDir, readyFile := setupRunningCommandStub(t, "signal-stop", false)
+
+	cmd := exec.Command(filepath.Join(tempDir, "signal-stop"))
+	stopCh := make(chan struct{})
+	errCh := make(chan error, 1)
+	go func() {
+		errCh <- runSignalStopCommand(context.Background(), cmd, stopCh, nil)
+	}()
+
+	waitForFile(t, readyFile, 5*time.Second)
+	close(stopCh)
+
+	err := <-errCh
+	require.NoError(t, err)
+}
+
+func TestRunSignalStopCommandReturnsContextCancellation(t *testing.T) {
+	tempDir, readyFile := setupRunningCommandStub(t, "signal-stop-ctx", false)
+
+	cmd := exec.Command(filepath.Join(tempDir, "signal-stop-ctx"))
+	stopCh := make(chan struct{})
+	ctx, cancel := context.WithCancel(context.Background())
+	errCh := make(chan error, 1)
+	go func() {
+		errCh <- runSignalStopCommand(ctx, cmd, stopCh, nil)
+	}()
+	t.Cleanup(cancel)
+
+	waitForFile(t, readyFile, 5*time.Second)
+	cancel()
+
+	err := <-errCh
+	require.ErrorIs(t, err, context.Canceled)
+}
+
+func TestRunSignalStopCommandKillsWhenInterruptIgnored(t *testing.T) {
+	tempDir, readyFile := setupRunningCommandStub(t, "signal-stop-ign", true)
+
+	cmd := exec.Command(filepath.Join(tempDir, "signal-stop-ign"))
+	stopCh := make(chan struct{})
+	errCh := make(chan error, 1)
+	go func() {
+		errCh <- runSignalStopCommand(context.Background(), cmd, stopCh, nil)
+	}()
+
+	waitForFile(t, readyFile, 5*time.Second)
+	close(stopCh)
+
+	err := <-errCh
+	require.NoError(t, err)
+}
+
+func TestRunSignalStopCommandSubprocessExitsOnItsOwn(t *testing.T) {
+	tempDir := t.TempDir()
+	stubPath := filepath.Join(tempDir, "quick-exit")
+	stub := "#!/bin/sh\nexit 0\n"
+	require.NoError(t, os.WriteFile(stubPath, []byte(stub), 0o755))
+
+	cmd := exec.Command(stubPath)
+	stopCh := make(chan struct{})
+	err := runSignalStopCommand(context.Background(), cmd, stopCh, nil)
+	require.NoError(t, err)
+}
+
+func TestPipeWireSignalStopModeStopsOnChannel(t *testing.T) {
+	tempDir, readyFile := setupRunningCommandStub(t, "pw-record", false)
+
+	backend := newPipeWireBackend()
+	require.True(t, backend.Available())
+
+	stopCh := make(chan struct{})
+	errCh := make(chan error, 1)
+	go func() {
+		errCh <- backend.Record(context.Background(), Config{
+			OutputPath: filepath.Join(tempDir, "out.wav"),
+			StopCh:     stopCh,
+		})
+	}()
+
+	waitForFile(t, readyFile, 5*time.Second)
+	close(stopCh)
+
+	err := <-errCh
+	require.NoError(t, err)
+}
+
+func TestALSASignalStopModeStopsOnChannel(t *testing.T) {
+	tempDir, readyFile := setupRunningCommandStub(t, "arecord", false)
+
+	backend := newALSARecorderBackend()
+	require.True(t, backend.Available())
+
+	stopCh := make(chan struct{})
+	errCh := make(chan error, 1)
+	go func() {
+		errCh <- backend.Record(context.Background(), Config{
+			OutputPath: filepath.Join(tempDir, "out.wav"),
+			StopCh:     stopCh,
+		})
+	}()
+
+	waitForFile(t, readyFile, 5*time.Second)
+	close(stopCh)
+
+	err := <-errCh
+	require.NoError(t, err)
+}
+
+func TestFFMPEGLinuxSignalStopModeStopsOnChannel(t *testing.T) {
+	tempDir, readyFile := setupRunningCommandStub(t, "ffmpeg", false)
+
+	backend := newFFMPEGLinuxBackend()
+	require.True(t, backend.Available())
+
+	stopCh := make(chan struct{})
+	errCh := make(chan error, 1)
+	go func() {
+		errCh <- backend.Record(context.Background(), Config{
+			OutputPath: filepath.Join(tempDir, "out.wav"),
+			Format:     "pulse",
+			StopCh:     stopCh,
+		})
+	}()
+
+	waitForFile(t, readyFile, 5*time.Second)
+	close(stopCh)
+
+	err := <-errCh
+	require.NoError(t, err)
+}
+
+func TestFFMPEGMacSignalStopModeStopsOnChannel(t *testing.T) {
+	tempDir, readyFile := setupRunningCommandStub(t, "ffmpeg", false)
+
+	backend := newFFMPEGMacOSBackend()
+	require.True(t, backend.Available())
+
+	stopCh := make(chan struct{})
+	errCh := make(chan error, 1)
+	go func() {
+		errCh <- backend.Record(context.Background(), Config{
+			OutputPath: filepath.Join(tempDir, "out.wav"),
+			StopCh:     stopCh,
+		})
+	}()
+
+	waitForFile(t, readyFile, 5*time.Second)
+	close(stopCh)
+
+	err := <-errCh
+	require.NoError(t, err)
+}
+
 func setupRunningCommandStub(t *testing.T, name string, ignoreInterrupt bool) (string, string) {
 	t.Helper()
 

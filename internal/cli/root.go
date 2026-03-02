@@ -38,6 +38,7 @@ type appState struct {
 	silenceDBFS  float64
 	duration     time.Duration
 	immediate    bool
+	pidFile      string
 
 	logger *zap.Logger
 	now    func() time.Time
@@ -95,6 +96,7 @@ func NewRootCmd() *cobra.Command {
 	bindCopyAndSilenceFlags(cmd, app)
 	cmd.Flags().DurationVar(&app.duration, "duration", 0, "Record duration, e.g. 10s; 0 means interactive start/stop")
 	cmd.Flags().BoolVar(&app.immediate, "immediate", false, "Start recording immediately without waiting for Enter")
+	cmd.Flags().StringVar(&app.pidFile, "pid-file", "", "Write PID to file and wait for SIGUSR1 to stop recording")
 
 	cmd.AddCommand(newRecordCmd(app))
 	cmd.AddCommand(newTranscribeCmd(app))

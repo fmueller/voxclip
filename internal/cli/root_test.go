@@ -34,6 +34,8 @@ func TestRootCommandRegistersCoreSubcommands(t *testing.T) {
 	require.Equal(t, "0s", cmd.Flags().Lookup("duration").DefValue)
 	require.NotNil(t, cmd.Flags().Lookup("immediate"))
 	require.Equal(t, "false", cmd.Flags().Lookup("immediate").DefValue)
+	require.NotNil(t, cmd.Flags().Lookup("pid-file"))
+	require.Equal(t, "", cmd.Flags().Lookup("pid-file").DefValue)
 	require.Nil(t, cmd.PersistentFlags().Lookup("model"))
 }
 
@@ -99,6 +101,8 @@ func TestSubcommandsRejectIrrelevantFlags(t *testing.T) {
 		{name: "transcribe rejects backend", args: []string{"transcribe", "--backend", "auto", "/tmp/audio.wav"}},
 		{name: "setup rejects language", args: []string{"setup", "--language", "de"}},
 		{name: "devices rejects verbose", args: []string{"devices", "--verbose"}},
+		{name: "transcribe rejects pid-file", args: []string{"transcribe", "--pid-file", "/tmp/x.pid", "/tmp/audio.wav"}},
+		{name: "setup rejects pid-file", args: []string{"setup", "--pid-file", "/tmp/x.pid"}},
 	}
 
 	for _, tt := range tests {
@@ -134,6 +138,7 @@ func TestHelpShowsStrictFlagScopes(t *testing.T) {
 				"--copy-empty",
 				"--duration duration",
 				"--input string",
+				"--pid-file string",
 			},
 		},
 		{
@@ -142,6 +147,7 @@ func TestHelpShowsStrictFlagScopes(t *testing.T) {
 			contains: []string{
 				"--backend string",
 				"--duration duration",
+				"--pid-file string",
 			},
 			notContains: []string{
 				"--model string",
@@ -159,6 +165,7 @@ func TestHelpShowsStrictFlagScopes(t *testing.T) {
 			notContains: []string{
 				"--backend string",
 				"--input-format",
+				"--pid-file",
 				"Global Flags:",
 			},
 		},
@@ -172,6 +179,7 @@ func TestHelpShowsStrictFlagScopes(t *testing.T) {
 			notContains: []string{
 				"--backend string",
 				"--language string",
+				"--pid-file",
 				"Global Flags:",
 			},
 		},
@@ -181,6 +189,7 @@ func TestHelpShowsStrictFlagScopes(t *testing.T) {
 			notContains: []string{
 				"--verbose",
 				"--model string",
+				"--pid-file",
 				"Global Flags:",
 			},
 		},
@@ -190,6 +199,7 @@ func TestHelpShowsStrictFlagScopes(t *testing.T) {
 			notContains: []string{
 				"--verbose",
 				"--model string",
+				"--pid-file",
 				"Global Flags:",
 			},
 		},

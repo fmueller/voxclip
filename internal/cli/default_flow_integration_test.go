@@ -218,6 +218,42 @@ func TestRunDefaultForwardsDurationToRecordOptions(t *testing.T) {
 	require.Equal(t, 5*time.Second, captured.duration)
 }
 
+func TestRunDefaultWithPIDFilePipelineContinuesAfterRecordStop(t *testing.T) {
+	var order []string
+	out := new(bytes.Buffer)
+	audioFile := filepath.Join(t.TempDir(), "audio.wav")
+	require.NoError(t, os.WriteFile(audioFile, []byte("fake"), 0o644))
+
+	app := &appState{
+		out:         out,
+		pidFile:     filepath.Join(t.TempDir(), "test.pid"),
+		preflightFn: noopPreflight,
+		recordFn: func(_ context.Context, _ recordOptions) (string, error) {
+			order = append(order, "record")
+			return audioFile, nil
+		},
+		transcribeFn: func(_ context.Context, audioPath string) (string, error) {
+			order = append(order, "transcribe:"+audioPath)
+			return "hello from pid-file", nil
+		},
+		copyFn: func(_ context.Context, value string) error {
+			order = append(order, "copy:"+value)
+			return nil
+		},
+	}
+
+	err := app.runDefault(context.Background())
+	require.NoError(t, err)
+	require.Equal(t, "hello from pid-file\n", out.String())
+	require.Equal(t, []string{
+		"record",
+		"transcribe:" + audioFile,
+		"copy:hello from pid-file",
+	}, order)
+	_, statErr := os.Stat(audioFile)
+	require.ErrorIs(t, statErr, os.ErrNotExist, "recording should be removed after default flow")
+}
+
 func TestRunDefaultPreflightErrorAbortsBeforeRecording(t *testing.T) {
 	recorded := false
 	app := &appState{

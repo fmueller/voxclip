@@ -50,15 +50,17 @@ func (b *ffmpegMacBackend) Record(ctx context.Context, cfg Config) error {
 	)
 
 	var cmd *exec.Cmd
-	if cfg.Interactive {
-		cmd = exec.CommandContext(ctx, "ffmpeg", args...)
-	} else if cfg.Duration > 0 {
+	if cfg.StopCh != nil || cfg.Duration > 0 {
 		cmd = exec.Command("ffmpeg", args...)
 	} else {
 		cmd = exec.CommandContext(ctx, "ffmpeg", args...)
 	}
 	cmd.Stdout = os.Stderr
 	cmd.Stderr = os.Stderr
+
+	if cfg.StopCh != nil {
+		return runSignalStopCommand(ctx, cmd, cfg.StopCh, cfg.Logger)
+	}
 
 	if cfg.Interactive {
 		return runInteractiveCommand(ctx, cmd, cfg.Logger)

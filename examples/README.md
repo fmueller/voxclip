@@ -102,6 +102,43 @@ For non-English prompts, set the language explicitly — auto-detection can be u
 voxclip --language de --no-progress --duration 8s 2>/dev/null
 ```
 
+## Toggle-Style Auto-Paste Hotkey
+
+`vpaste-toggle.sh` is a toggle alternative to `vpaste.sh`: press the hotkey once to start recording, press it again to stop. No fixed duration needed.
+
+### How it works
+
+1. **First press:** The script starts `voxclip --pid-file ...` which begins recording and blocks.
+2. **Second press:** The script detects the running instance via the PID file, sends `SIGUSR1`, and exits immediately.
+3. The first instance stops recording, transcribes, copies the transcript to the clipboard, and simulates a paste keystroke.
+
+### Setup
+
+Install the same way as `vpaste.sh`:
+
+```bash
+cp examples/vpaste-toggle.sh ~/.local/bin/vpaste-toggle
+chmod +x ~/.local/bin/vpaste-toggle
+```
+
+Then bind `~/.local/bin/vpaste-toggle` to a global hotkey:
+
+- **GNOME:** Settings > Keyboard > Custom Shortcuts
+- **KDE:** System Settings > Shortcuts > Custom Shortcuts
+- **macOS:** Shortcuts.app > Run Shell Script (set shell to `/bin/zsh`)
+
+### Configuration
+
+Set `VOXCLIP_MODEL` to change the model (default: `small`):
+
+```bash
+export VOXCLIP_MODEL=tiny
+```
+
+### Requirements
+
+Same as `vpaste.sh` — see the [requirements section](#requirements) above.
+
 ## One-shot invocation (non-interactive)
 
 ### `vprompt` — command substitution (fixed duration)
