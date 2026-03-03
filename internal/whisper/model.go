@@ -5,11 +5,25 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
 	"sort"
 	"strings"
 )
 
-const DefaultModel = "small"
+// DefaultModel returns the default model name for the current OS.
+func DefaultModel() string {
+	return DefaultModelForOS(runtime.GOOS)
+}
+
+// DefaultModelForOS returns the default model name for the given OS.
+// Linux defaults to "tiny" for faster performance on typical hardware;
+// other platforms default to "small".
+func DefaultModelForOS(goos string) string {
+	if goos == "linux" {
+		return "tiny"
+	}
+	return "small"
+}
 
 type Model struct {
 	Name      string
@@ -78,7 +92,7 @@ func LookupModel(name string) (Model, bool) {
 
 func ResolveModel(modelRef, modelDir string) (ResolvedModel, error) {
 	if strings.TrimSpace(modelRef) == "" {
-		modelRef = DefaultModel
+		modelRef = DefaultModel()
 	}
 
 	if model, ok := LookupModel(modelRef); ok {

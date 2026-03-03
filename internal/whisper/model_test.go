@@ -14,10 +14,25 @@ func TestResolveModelDefaultNamedModel(t *testing.T) {
 	modelDir := t.TempDir()
 	resolved, err := ResolveModel("", modelDir)
 	require.NoError(t, err)
-	require.Equal(t, DefaultModel, resolved.Name)
-	require.Equal(t, filepath.Join(modelDir, "ggml-small.bin"), resolved.Path)
+
+	wantName := DefaultModel()
+	wantModel, ok := LookupModel(wantName)
+	require.True(t, ok)
+
+	require.Equal(t, wantName, resolved.Name)
+	require.Equal(t, filepath.Join(modelDir, wantModel.FileName), resolved.Path)
 	require.True(t, resolved.NeedsDownload)
 	require.False(t, resolved.IsCustomPath)
+}
+
+func TestDefaultModelForLinux(t *testing.T) {
+	t.Parallel()
+	require.Equal(t, "tiny", DefaultModelForOS("linux"))
+}
+
+func TestDefaultModelForMacOS(t *testing.T) {
+	t.Parallel()
+	require.Equal(t, "small", DefaultModelForOS("darwin"))
 }
 
 func TestResolveModelExistingNamedModel(t *testing.T) {
