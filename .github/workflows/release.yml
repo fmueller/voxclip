@@ -145,6 +145,22 @@ jobs:
           fi
           echo "Version check passed: ${tag_version}"
 
+      - name: Extract release notes from CHANGELOG.md
+        run: |
+          set -euo pipefail
+
+          VERSION="${GITHUB_REF_NAME#v}"
+          # Extract everything between the heading for this version and the next heading
+          awk "/^## \\[${VERSION}\\]/{found=1; next} /^## \\[/{if(found) exit} found && !/^\\[.+\\]:/" CHANGELOG.md > release-notes.md
+
+          if [[ ! -s release-notes.md ]]; then
+            echo "No changelog entry found for version ${VERSION}, falling back to tag name" >&2
+            echo "Release ${GITHUB_REF_NAME}" > release-notes.md
+          fi
+
+          echo "--- Release notes for ${VERSION} ---"
+          cat release-notes.md
+
       - name: Run GoReleaser (snapshot)
         if: github.event_name == 'workflow_dispatch'
         uses: goreleaser/goreleaser-action@v7
@@ -161,6 +177,6 @@ jobs:
         with:
           distribution: goreleaser
           version: '~> v2'
-          args: release --clean
+          args: release --clean --release-notes release-notes.md
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
