@@ -235,6 +235,7 @@ func downloadOnce(ctx context.Context, opts Options, expectedChecksum string) er
 
 	if bar != nil {
 		_ = bar.Finish()
+		fmt.Fprint(os.Stderr, "\n")
 	}
 
 	if err := outFile.Sync(); err != nil {
