@@ -1,0 +1,59 @@
+baseURL: https://voxclip.dev/
+title: Voxclip
+languageCode: en-us
+
+module:
+  imports:
+    - path: github.com/imfing/hextra
+
+markup:
+  goldmark:
+    renderer:
+      unsafe: true
+  highlight:
+    noClasses: false
+
+enableRobotsTXT: true
+
+menu:
+  main:
+    - name: Documentation
+      pageRef: /docs
+      weight: 1
+    - name: Search
+      weight: 3
+      params:
+        type: search
+    - name: GitHub
+      weight: 4
+      url: "https://github.com/fmueller/voxclip"
+      params:
+        icon: github
+
+params:
+  description: Voice capture and transcription from your terminal. Record, transcribe, and copy — all locally with open-source speech models.
+
+  navbar:
+    displayTitle: true
+    displayLogo: false
+
+  theme:
+    default: system
+    displayToggle: true
+
+  footer:
+    displayCopyright: true
+    displayPoweredBy: false
+
+  page:
+    width: normal
+
+  search:
+    enable: true
+    type: flexsearch
+    flexsearch:
+      index: content
+
+  editURL:
+    enable: true
+    base: "https://github.com/fmueller/voxclip/edit/main/website/content"
