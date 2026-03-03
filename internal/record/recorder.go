@@ -303,7 +303,7 @@ func runTimedCommand(ctx context.Context, cmd *exec.Cmd, duration time.Duration,
 	}
 }
 
-func runSignalStopCommand(ctx context.Context, cmd *exec.Cmd, stopCh <-chan struct{}, logger *zap.Logger) error {
+func runSignalStopCommand(ctx context.Context, cmd *exec.Cmd, stopCh <-chan struct{}, duration time.Duration, logger *zap.Logger) error {
 	if logger == nil {
 		logger = zap.NewNop()
 	}
@@ -317,39 +317,21 @@ func runSignalStopCommand(ctx context.Context, cmd *exec.Cmd, stopCh <-chan stru
 		done <- cmd.Wait()
 	}()
 
+	var timerCh <-chan time.Time
+	if duration > 0 {
+		t := time.NewTimer(duration)
+		defer t.Stop()
+		timerCh = t.C
+	}
+
 	for {
 		select {
 		case err := <-done:
 			return err
 		case <-stopCh:
-			stopSignalSent := signalInterrupt(cmd.Process)
-			err, exited := waitForDone(done, timedStopGracePeriod)
-			if !exited {
-				logger.Debug("recording process did not exit after stop signal; killing")
-				_ = cmd.Process.Kill()
-				err = <-done
-			}
-
-			if err == nil {
-				return nil
-			}
-
-			if stopSignalSent {
-				logger.Debug("recording process exited after stop signal", zap.Error(err))
-				return nil
-			}
-
-			var exitErr *exec.ExitError
-			if errors.As(err, &exitErr) {
-				if status, ok := exitErr.Sys().(syscall.WaitStatus); ok {
-					if status.Signaled() {
-						logger.Debug("recording process stopped by signal", zap.String("signal", status.Signal().String()))
-						return nil
-					}
-				}
-			}
-
-			return err
+			return shutdownProcess(cmd, done, true, logger)
+		case <-timerCh:
+			return shutdownProcess(cmd, done, true, logger)
 		case <-ctx.Done():
 			_ = signalInterrupt(cmd.Process)
 			if _, exited := waitForDone(done, timedStopGracePeriod); !exited {
@@ -360,6 +342,37 @@ func runSignalStopCommand(ctx context.Context, cmd *exec.Cmd, stopCh <-chan stru
 			return ctx.Err()
 		}
 	}
+}
+
+func shutdownProcess(cmd *exec.Cmd, done <-chan error, expectStop bool, logger *zap.Logger) error {
+	stopSignalSent := signalInterrupt(cmd.Process)
+	err, exited := waitForDone(done, timedStopGracePeriod)
+	if !exited {
+		logger.Debug("recording process did not exit after stop signal; killing")
+		_ = cmd.Process.Kill()
+		err = <-done
+	}
+
+	if err == nil {
+		return nil
+	}
+
+	if stopSignalSent && expectStop {
+		logger.Debug("recording process exited after stop signal", zap.Error(err))
+		return nil
+	}
+
+	var exitErr *exec.ExitError
+	if errors.As(err, &exitErr) {
+		if status, ok := exitErr.Sys().(syscall.WaitStatus); ok {
+			if status.Signaled() {
+				logger.Debug("recording process stopped by signal", zap.String("signal", status.Signal().String()))
+				return nil
+			}
+		}
+	}
+
+	return err
 }
 
 func signalInterrupt(process *os.Process) bool {

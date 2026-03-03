@@ -119,7 +119,7 @@ func TestRunSignalStopCommandStopsOnChannel(t *testing.T) {
 	stopCh := make(chan struct{})
 	errCh := make(chan error, 1)
 	go func() {
-		errCh <- runSignalStopCommand(context.Background(), cmd, stopCh, nil)
+		errCh <- runSignalStopCommand(context.Background(), cmd, stopCh, 0, nil)
 	}()
 
 	waitForFile(t, readyFile, 5*time.Second)
@@ -137,7 +137,7 @@ func TestRunSignalStopCommandReturnsContextCancellation(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	errCh := make(chan error, 1)
 	go func() {
-		errCh <- runSignalStopCommand(ctx, cmd, stopCh, nil)
+		errCh <- runSignalStopCommand(ctx, cmd, stopCh, 0, nil)
 	}()
 	t.Cleanup(cancel)
 
@@ -155,7 +155,7 @@ func TestRunSignalStopCommandKillsWhenInterruptIgnored(t *testing.T) {
 	stopCh := make(chan struct{})
 	errCh := make(chan error, 1)
 	go func() {
-		errCh <- runSignalStopCommand(context.Background(), cmd, stopCh, nil)
+		errCh <- runSignalStopCommand(context.Background(), cmd, stopCh, 0, nil)
 	}()
 
 	waitForFile(t, readyFile, 5*time.Second)
@@ -173,7 +173,7 @@ func TestRunSignalStopCommandSubprocessExitsOnItsOwn(t *testing.T) {
 
 	cmd := exec.Command(stubPath)
 	stopCh := make(chan struct{})
-	err := runSignalStopCommand(context.Background(), cmd, stopCh, nil)
+	err := runSignalStopCommand(context.Background(), cmd, stopCh, 0, nil)
 	require.NoError(t, err)
 }
 
@@ -285,4 +285,73 @@ func setupRunningCommandStub(t *testing.T, name string, ignoreInterrupt bool) (s
 	t.Setenv("READY_FILE", readyFile)
 
 	return tempDir, readyFile
+}
+
+func TestRunSignalStopCommandStopsOnMaxDuration(t *testing.T) {
+	tempDir, readyFile := setupRunningCommandStub(t, "duration-stop", false)
+
+	cmd := exec.Command(filepath.Join(tempDir, "duration-stop"))
+	stopCh := make(chan struct{})
+	errCh := make(chan error, 1)
+	go func() {
+		errCh <- runSignalStopCommand(context.Background(), cmd, stopCh, 200*time.Millisecond, nil)
+	}()
+
+	waitForFile(t, readyFile, 5*time.Second)
+
+	err := <-errCh
+	require.NoError(t, err)
+}
+
+func TestRunSignalStopCommandSignalBeforeMaxDuration(t *testing.T) {
+	tempDir, readyFile := setupRunningCommandStub(t, "signal-first", false)
+
+	cmd := exec.Command(filepath.Join(tempDir, "signal-first"))
+	stopCh := make(chan struct{})
+	errCh := make(chan error, 1)
+	go func() {
+		errCh <- runSignalStopCommand(context.Background(), cmd, stopCh, 10*time.Second, nil)
+	}()
+
+	waitForFile(t, readyFile, 5*time.Second)
+	close(stopCh)
+
+	err := <-errCh
+	require.NoError(t, err)
+}
+
+func TestRunSignalStopCommandZeroMaxDurationWaitsForSignal(t *testing.T) {
+	tempDir, readyFile := setupRunningCommandStub(t, "zero-dur", false)
+
+	cmd := exec.Command(filepath.Join(tempDir, "zero-dur"))
+	stopCh := make(chan struct{})
+	errCh := make(chan error, 1)
+	go func() {
+		errCh <- runSignalStopCommand(context.Background(), cmd, stopCh, 0, nil)
+	}()
+
+	waitForFile(t, readyFile, 5*time.Second)
+	close(stopCh)
+
+	err := <-errCh
+	require.NoError(t, err)
+}
+
+func TestRunSignalStopCommandContextCancelWithMaxDuration(t *testing.T) {
+	tempDir, readyFile := setupRunningCommandStub(t, "ctx-dur", false)
+
+	cmd := exec.Command(filepath.Join(tempDir, "ctx-dur"))
+	stopCh := make(chan struct{})
+	ctx, cancel := context.WithCancel(context.Background())
+	errCh := make(chan error, 1)
+	go func() {
+		errCh <- runSignalStopCommand(ctx, cmd, stopCh, 10*time.Second, nil)
+	}()
+	t.Cleanup(cancel)
+
+	waitForFile(t, readyFile, 5*time.Second)
+	cancel()
+
+	err := <-errCh
+	require.ErrorIs(t, err, context.Canceled)
 }

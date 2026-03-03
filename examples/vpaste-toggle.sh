@@ -26,7 +26,8 @@ if [ -f "$PID_FILE" ] && kill -0 "$(cat "$PID_FILE")" 2>/dev/null; then
 fi
 
 # Start recording; blocks until SIGUSR1 stops it.
-voxclip --pid-file "$PID_FILE" --model "${VOXCLIP_MODEL:-small}" --no-progress 2>/dev/null || {
+# --duration 5m acts as a safety timeout in case the stop hotkey is missed.
+voxclip --pid-file "$PID_FILE" --duration 5m --model "${VOXCLIP_MODEL:-small}" --no-progress 2>/dev/null || {
   echo "vpaste-toggle: recording failed; is voxclip installed?" >&2
   exit 1
 }

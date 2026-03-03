@@ -119,7 +119,7 @@ Flags are command-scoped. If you pass a flag to a command that does not support 
 - `--silence-threshold-dbfs <value>` set silence-gate threshold
 - `--duration <duration>` set fixed recording duration, e.g. `10s`
 - `--immediate` start recording immediately
-- `--pid-file <path>` write PID to file and wait for SIGUSR1 to stop recording (for toggle-style hotkey workflows)
+- `--pid-file <path>` write PID to file and wait for SIGUSR1 to stop recording (for toggle-style hotkey workflows); combine with `--duration` as a safety timeout
 - `--no-progress` disable spinner/progress indicators
 - `--verbose` enable verbose logs
 - `--json` output logs in JSON format
