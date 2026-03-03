@@ -10,7 +10,7 @@
 
 NOTES_FILE="${VNOTE_FILE:-$HOME/voice-notes.txt}"
 
-text=$(voxclip --no-progress --duration "${VNOTE_DURATION:-15s}" 2>/dev/null) || {
+text=$(voxclip --language en --no-progress --duration "${VNOTE_DURATION:-15s}" 2>/dev/null) || {
   echo "vnote: recording failed; is voxclip installed?" >&2
   exit 1
 }
