@@ -39,7 +39,7 @@ func newRecordCmd(app *appState) *cobra.Command {
 	bindLoggingFlags(cmd, app)
 	bindProgressFlag(cmd, app)
 	bindRecordingBackendFlags(cmd, app)
-	cmd.Flags().DurationVar(&opts.duration, "duration", 0, "Record duration, e.g. 6s; 0 means interactive start/stop")
+	cmd.Flags().DurationVar(&opts.duration, "duration", 0, "Record duration, e.g. 6s; 0 means interactive start/stop (acts as max timeout with --pid-file)")
 	cmd.Flags().StringVar(&opts.output, "output", "", "Output WAV file path")
 	cmd.Flags().BoolVar(&app.immediate, "immediate", false, "Start recording immediately without waiting for Enter")
 	cmd.Flags().StringVar(&app.pidFile, "pid-file", "", "Write PID to file and wait for SIGUSR1 to stop recording")

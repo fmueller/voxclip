@@ -59,7 +59,7 @@ func (b *ffmpegMacBackend) Record(ctx context.Context, cfg Config) error {
 	cmd.Stderr = os.Stderr
 
 	if cfg.StopCh != nil {
-		return runSignalStopCommand(ctx, cmd, cfg.StopCh, cfg.Logger)
+		return runSignalStopCommand(ctx, cmd, cfg.StopCh, cfg.Duration, cfg.Logger)
 	}
 
 	if cfg.Interactive {

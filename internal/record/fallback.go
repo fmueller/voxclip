@@ -77,7 +77,7 @@ func (b *ffmpegLinuxBackend) Record(ctx context.Context, cfg Config) error {
 		cmd.Stderr = os.Stderr
 
 		if cfg.StopCh != nil {
-			err := runSignalStopCommand(ctx, cmd, cfg.StopCh, cfg.Logger)
+			err := runSignalStopCommand(ctx, cmd, cfg.StopCh, cfg.Duration, cfg.Logger)
 			if err == nil {
 				return nil
 			}
