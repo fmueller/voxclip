@@ -156,6 +156,68 @@ func TestRunDefaultCopiesBlankWhenCopyEmptyEnabled(t *testing.T) {
 	require.ErrorIs(t, statErr, os.ErrNotExist, "recording should be removed after default flow")
 }
 
+func TestRunDefaultCopiesWithNewlineWhenCopyNewlineEnabled(t *testing.T) {
+	var order []string
+	var copiedValue string
+	out := new(bytes.Buffer)
+	audioFile := filepath.Join(t.TempDir(), "audio.wav")
+	require.NoError(t, os.WriteFile(audioFile, []byte("fake"), 0o644))
+
+	app := &appState{
+		out:         out,
+		copyNewline: true,
+		preflightFn: noopPreflight,
+		recordFn: func(_ context.Context, _ recordOptions) (string, error) {
+			order = append(order, "record")
+			return audioFile, nil
+		},
+		transcribeFn: func(_ context.Context, audioPath string) (string, error) {
+			order = append(order, "transcribe:"+audioPath)
+			return "hello world", nil
+		},
+		copyFn: func(_ context.Context, value string) error {
+			copiedValue = value
+			order = append(order, "copy:"+value)
+			return nil
+		},
+	}
+
+	err := app.runDefault(context.Background())
+	require.NoError(t, err)
+	require.Equal(t, "hello world\n", copiedValue)
+	require.Equal(t, []string{
+		"record",
+		"transcribe:" + audioFile,
+		"copy:hello world\n",
+	}, order)
+}
+
+func TestRunDefaultCopiesWithoutNewlineByDefault(t *testing.T) {
+	var copiedValue string
+	out := new(bytes.Buffer)
+	audioFile := filepath.Join(t.TempDir(), "audio.wav")
+	require.NoError(t, os.WriteFile(audioFile, []byte("fake"), 0o644))
+
+	app := &appState{
+		out:         out,
+		preflightFn: noopPreflight,
+		recordFn: func(_ context.Context, _ recordOptions) (string, error) {
+			return audioFile, nil
+		},
+		transcribeFn: func(_ context.Context, _ string) (string, error) {
+			return "hello world", nil
+		},
+		copyFn: func(_ context.Context, value string) error {
+			copiedValue = value
+			return nil
+		},
+	}
+
+	err := app.runDefault(context.Background())
+	require.NoError(t, err)
+	require.Equal(t, "hello world", copiedValue)
+}
+
 func TestRunDefaultSkipsTranscribeWhenRecordingIsSilent(t *testing.T) {
 	path := filepath.Join(t.TempDir(), "silent.wav")
 	require.NoError(t, os.WriteFile(path, makePCM16WAVForTest(make([]int16, 16000), 16000, 1), 0o644))

@@ -47,7 +47,12 @@ func newTranscribeCmd(app *appState) *cobra.Command {
 					return nil
 				}
 
-				if err := copyFn(cmd.Context(), transcript); err != nil {
+				clipText := transcript
+				if app.copyNewline {
+					clipText += "\n"
+				}
+
+				if err := copyFn(cmd.Context(), clipText); err != nil {
 					return err
 				}
 				app.log().Info("transcript copied to clipboard")

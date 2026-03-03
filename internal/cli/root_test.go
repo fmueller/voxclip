@@ -28,6 +28,8 @@ func TestRootCommandRegistersCoreSubcommands(t *testing.T) {
 	require.NotNil(t, cmd.Flags().Lookup("silence-threshold-dbfs"))
 	require.Equal(t, "true", cmd.Flags().Lookup("auto-download").DefValue)
 	require.Equal(t, "false", cmd.Flags().Lookup("copy-empty").DefValue)
+	require.NotNil(t, cmd.Flags().Lookup("copy-newline"))
+	require.Equal(t, "false", cmd.Flags().Lookup("copy-newline").DefValue)
 	require.Equal(t, "true", cmd.Flags().Lookup("silence-gate").DefValue)
 	require.Equal(t, "-65", cmd.Flags().Lookup("silence-threshold-dbfs").DefValue)
 	require.NotNil(t, cmd.Flags().Lookup("duration"))
