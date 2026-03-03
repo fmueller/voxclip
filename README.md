@@ -107,7 +107,7 @@ Flags are command-scoped. If you pass a flag to a command that does not support 
 
 ### Default-flow flags (`voxclip`)
 
-- `--model <name|path>` select a model name or local model path
+- `--model <name|path>` select a model name (tiny, base, small, medium, large-v3) or local model path (default: small)
 - `--model-dir <path>` override model storage directory
 - `--language <auto|en|de|...>` set transcription language
 - `--auto-download` automatically download a missing model

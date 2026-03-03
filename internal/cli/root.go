@@ -115,7 +115,7 @@ func bindProgressFlag(cmd *cobra.Command, app *appState) {
 }
 
 func bindModelFlags(cmd *cobra.Command, app *appState) {
-	cmd.Flags().StringVar(&app.model, "model", app.model, "Model name or model file path")
+	cmd.Flags().StringVar(&app.model, "model", app.model, fmt.Sprintf("Model name (%s) or model file path", strings.Join(whisper.ModelNames(), ", ")))
 	cmd.Flags().StringVar(&app.modelDir, "model-dir", app.modelDir, "Directory where models are stored")
 }
 
