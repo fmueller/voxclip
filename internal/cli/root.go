@@ -51,7 +51,7 @@ type appState struct {
 
 func NewRootCmd() *cobra.Command {
 	app := &appState{
-		model:        "small",
+		model:        whisper.DefaultModel(),
 		language:     "auto",
 		autoDownload: true,
 		backend:      "auto",
