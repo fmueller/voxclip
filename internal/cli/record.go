@@ -67,11 +67,11 @@ func (a *appState) recordAudio(ctx context.Context, opts recordOptions) (string,
 	a.log().Info("recording started", zap.String("backend", a.backend), zap.String("output", outPath))
 	stopProgress := func() {}
 	if a.pidFile != "" {
-		stopProgress = startSpinner(a.progressEnabled(), "Recording")
+		stopProgress = startSpinner(os.Stderr, a.progressEnabled(), "Recording")
 	} else if interactive {
-		stopProgress = startSpinner(a.progressEnabled(), "Recording")
+		stopProgress = startSpinner(os.Stderr, a.progressEnabled(), "Recording")
 	} else {
-		stopProgress = startDurationProgress(a.progressEnabled(), "Recording", opts.duration)
+		stopProgress = startDurationProgress(os.Stderr, a.progressEnabled(), "Recording", opts.duration)
 	}
 	defer stopProgress()
 
@@ -100,6 +100,7 @@ func (a *appState) recordAudio(ctx context.Context, opts recordOptions) (string,
 	}
 
 	backendName, err := record.RecordWithFallback(ctx, a.backend, recConfig)
+	stopProgress()
 	if err != nil {
 		return "", err
 	}

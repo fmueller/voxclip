@@ -88,7 +88,7 @@ func (a *appState) transcribeAudio(ctx context.Context, audioPath string) (strin
 	}
 
 	a.log().Info("transcribing...", zap.String("audio", audioPath), zap.String("model", model.Path), zap.String("language", a.language))
-	stopSpinner := startSpinner(a.progressEnabled(), "Transcribing")
+	stopSpinner := startSpinner(os.Stderr, a.progressEnabled(), "Transcribing")
 	started := time.Now()
 
 	transcript, err := engine.Transcribe(ctx, whisper.TranscriptionRequest{

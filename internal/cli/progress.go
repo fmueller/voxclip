@@ -1,7 +1,8 @@
 package cli
 
 import (
-	"os"
+	"fmt"
+	"io"
 	"sync"
 	"time"
 
@@ -10,7 +11,7 @@ import (
 
 type stopFunc func()
 
-func startSpinner(enabled bool, description string) stopFunc {
+func startSpinner(w io.Writer, enabled bool, description string) stopFunc {
 	if !enabled {
 		return func() {}
 	}
@@ -18,7 +19,7 @@ func startSpinner(enabled bool, description string) stopFunc {
 	bar := progressbar.NewOptions(
 		-1,
 		progressbar.OptionSetDescription(description),
-		progressbar.OptionSetWriter(os.Stderr),
+		progressbar.OptionSetWriter(w),
 		progressbar.OptionSpinnerType(14),
 		progressbar.OptionThrottle(80*time.Millisecond),
 		progressbar.OptionShowCount(),
@@ -37,6 +38,7 @@ func startSpinner(enabled bool, description string) stopFunc {
 			select {
 			case <-stopCh:
 				_ = bar.Finish()
+				fmt.Fprint(w, "\n")
 				return
 			case <-ticker.C:
 				_ = bar.Add(1)
@@ -53,7 +55,7 @@ func startSpinner(enabled bool, description string) stopFunc {
 	}
 }
 
-func startDurationProgress(enabled bool, description string, duration time.Duration) stopFunc {
+func startDurationProgress(w io.Writer, enabled bool, description string, duration time.Duration) stopFunc {
 	if !enabled || duration <= 0 {
 		return func() {}
 	}
@@ -66,7 +68,7 @@ func startDurationProgress(enabled bool, description string, duration time.Durat
 	bar := progressbar.NewOptions64(
 		total,
 		progressbar.OptionSetDescription(description),
-		progressbar.OptionSetWriter(os.Stderr),
+		progressbar.OptionSetWriter(w),
 		progressbar.OptionShowCount(),
 		progressbar.OptionSetWidth(20),
 		progressbar.OptionThrottle(65*time.Millisecond),
@@ -85,6 +87,7 @@ func startDurationProgress(enabled bool, description string, duration time.Durat
 			select {
 			case <-stopCh:
 				_ = bar.Finish()
+				fmt.Fprint(w, "\n")
 				return
 			case <-ticker.C:
 				_ = bar.Add(1)
