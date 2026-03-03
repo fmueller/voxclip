@@ -45,4 +45,4 @@ checksum:
   name_template: checksums.txt
 
 changelog:
-  use: git
+  disable: true
