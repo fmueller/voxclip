@@ -7,7 +7,7 @@
 #   # Paste with Cmd+V (macOS) or Ctrl+Shift+V (terminal).
 
 vprompt_interactive() {
-  voxclip --immediate 2>/dev/null || {
+  voxclip --language en --immediate 2>/dev/null || {
     echo "vprompt_interactive: recording failed; is voxclip installed?" >&2
     return 1
   }

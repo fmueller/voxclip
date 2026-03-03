@@ -93,7 +93,7 @@ export VPROMPT_DURATION=12s
 For faster transcription in voice-prompt workflows, use `--model tiny` (~40 MB download instead of ~465 MB for the default `small` model). Edit the script or override the model flag:
 
 ```bash
-voxclip --model tiny --no-progress --duration 8s 2>/dev/null
+voxclip --language en --model tiny --no-progress --duration 8s 2>/dev/null
 ```
 
 For non-English prompts, set the language explicitly — auto-detection can be unreliable for short utterances:
