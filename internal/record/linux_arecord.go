@@ -55,7 +55,7 @@ func (b *alsaBackend) Record(ctx context.Context, cfg Config) error {
 	}
 
 	if cfg.Interactive {
-		return runInteractiveCommand(ctx, cmd, cfg.Logger)
+		return runInteractiveCommand(ctx, cmd, cfg.Logger, cfg.InteractiveMessage)
 	}
 
 	if cfg.Duration > 0 {

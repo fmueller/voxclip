@@ -69,7 +69,7 @@ func (a *appState) recordAudio(ctx context.Context, opts recordOptions) (string,
 	if a.pidFile != "" {
 		stopProgress = startSpinner(os.Stderr, a.progressEnabled(), "Recording")
 	} else if interactive {
-		stopProgress = startSpinner(os.Stderr, a.progressEnabled(), "Recording")
+		stopProgress = startSpinner(os.Stderr, a.progressEnabled(), "Recording... press Enter to stop")
 	} else {
 		stopProgress = startDurationProgress(os.Stderr, a.progressEnabled(), "Recording", opts.duration)
 	}
@@ -84,6 +84,9 @@ func (a *appState) recordAudio(ctx context.Context, opts recordOptions) (string,
 		Input:       opts.input,
 		Format:      opts.format,
 		Logger:      a.log(),
+	}
+	if interactive && !a.progressEnabled() {
+		recConfig.InteractiveMessage = "Press Enter to stop recording."
 	}
 
 	if a.pidFile != "" {

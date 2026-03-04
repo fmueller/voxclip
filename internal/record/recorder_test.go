@@ -126,6 +126,29 @@ func TestRecordWithFallbackReturnsErrorWhenAllBackendsFail(t *testing.T) {
 	require.ErrorContains(t, err, "arecord")
 }
 
+func TestRecordWithFallbackPassesInteractiveMessage(t *testing.T) {
+	t.Parallel()
+
+	var capturedMsg string
+	backend := &stubBackend{
+		name:      "test",
+		available: true,
+		recordFn: func(cfg Config) error {
+			capturedMsg = cfg.InteractiveMessage
+			return nil
+		},
+	}
+	cfg := Config{
+		OutputPath:         filepath.Join(t.TempDir(), "audio.wav"),
+		Interactive:        true,
+		InteractiveMessage: "Press Enter to stop recording.",
+	}
+
+	_, err := recordWithFallback(context.Background(), []Backend{backend}, "auto", cfg)
+	require.NoError(t, err)
+	require.Equal(t, "Press Enter to stop recording.", capturedMsg)
+}
+
 func TestRecordWithFallbackRemovesPartialOutputBeforeRetry(t *testing.T) {
 	t.Parallel()
 
