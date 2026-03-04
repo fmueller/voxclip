@@ -11,7 +11,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `--pid-file` flag for toggle-style keyboard shortcut workflows: press a hotkey to start recording, press again to stop, then transcribe and paste automatically.
 - `--duration` now works alongside `--pid-file` as a safety timeout — recording stops on whichever comes first (signal or duration).
+- `--copy-newline` flag to append a trailing newline to the clipboard text.
 - `vpaste-toggle.sh` example script for binding voxclip to a single toggle hotkey (now includes `--duration 5m` as recommended practice).
+
+### Changed
+
+- Default model is now `tiny` on Linux (was `small`); macOS still defaults to `small`.
+- `--model` flag help text now lists available model names.
 
 ## [1.0.1] - 2026-02-27
 

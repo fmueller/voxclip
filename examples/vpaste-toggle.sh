@@ -17,8 +17,9 @@ export PATH="$HOME/.local/bin:/opt/homebrew/bin:/usr/local/bin:$PATH"
 PID_FILE="${XDG_RUNTIME_DIR:-/tmp}/voxclip-toggle.pid"
 
 # If a recording is already running, stop it and exit.
-if [ -f "$PID_FILE" ] && kill -0 "$(cat "$PID_FILE")" 2>/dev/null; then
-  kill -USR1 "$(cat "$PID_FILE")"
+pid=$(cat "$PID_FILE" 2>/dev/null)
+if [ -n "$pid" ] && kill -0 "$pid" 2>/dev/null; then
+  kill -USR1 "$pid"
   exit 0
 fi
 
