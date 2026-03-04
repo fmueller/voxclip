@@ -71,7 +71,7 @@ func TestStartDurationProgressSubSecondDuration(t *testing.T) {
 	stop()
 }
 
-func TestSpinnerOutputEndsWithNewline(t *testing.T) {
+func TestSpinnerOutputEndsWithCarriageReturn(t *testing.T) {
 	t.Parallel()
 	var buf safeBuffer
 	stop := startSpinner(&buf, true, "testing")
@@ -80,8 +80,8 @@ func TestSpinnerOutputEndsWithNewline(t *testing.T) {
 
 	output := buf.Bytes()
 	require.NotEmpty(t, output, "spinner should have written output")
-	require.True(t, bytes.HasSuffix(output, []byte("\n")),
-		"spinner output must end with newline to prevent log overlap, got trailing bytes: %q",
+	require.True(t, bytes.HasSuffix(output, []byte("\r")),
+		"spinner output must end with carriage return to clear the line, got trailing bytes: %q",
 		trailingBytes(output, 20))
 }
 

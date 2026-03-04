@@ -38,7 +38,6 @@ func startSpinner(w io.Writer, enabled bool, description string) stopFunc {
 			select {
 			case <-stopCh:
 				_ = bar.Finish()
-				fmt.Fprint(w, "\n")
 				return
 			case <-ticker.C:
 				_ = bar.Add(1)
@@ -72,7 +71,7 @@ func startDurationProgress(w io.Writer, enabled bool, description string, durati
 		progressbar.OptionShowCount(),
 		progressbar.OptionSetWidth(20),
 		progressbar.OptionThrottle(65*time.Millisecond),
-		progressbar.OptionClearOnFinish(),
+		progressbar.OptionOnCompletion(func() { fmt.Fprint(w, "\n") }),
 	)
 
 	stopCh := make(chan struct{})
@@ -87,7 +86,6 @@ func startDurationProgress(w io.Writer, enabled bool, description string, durati
 			select {
 			case <-stopCh:
 				_ = bar.Finish()
-				fmt.Fprint(w, "\n")
 				return
 			case <-ticker.C:
 				_ = bar.Add(1)
