@@ -134,6 +134,17 @@ jobs:
             file "$whisper"
           done
 
+      - name: Verify hardcoded version matches tag
+        if: github.event_name == 'push'
+        run: |
+          tag_version="${GITHUB_REF_NAME#v}"
+          code_version=$(grep -oP 'Version\s*=\s*"\K[^"]+' internal/version/version.go)
+          if [[ "$tag_version" != "$code_version" ]]; then
+            echo "::error::Version mismatch: tag is v${tag_version} but internal/version/version.go has \"${code_version}\". Bump the hardcoded Version before tagging."
+            exit 1
+          fi
+          echo "Version check passed: ${tag_version}"
+
       - name: Run GoReleaser (snapshot)
         if: github.event_name == 'workflow_dispatch'
         uses: goreleaser/goreleaser-action@v7
