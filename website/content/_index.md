@@ -26,7 +26,7 @@ curl -fsSL https://raw.githubusercontent.com/fmueller/voxclip/main/scripts/insta
 
 # Setup model and transcribe
 voxclip setup
-voxclip --language en
+voxclip
 ```
 
 <div class="hx-mt-6"></div>
@@ -61,10 +61,10 @@ voxclip setup
 ### Record and transcribe
 
 ```bash
-voxclip --language en
+voxclip
 ```
 
-Speak into your microphone, press `Ctrl+C` to stop, and the transcript is copied to your clipboard.
+Speak into your microphone, press `Ctrl+C` to stop, and the transcript prints in the terminal and is copied to your clipboard.
 
 {{% /steps %}}
 

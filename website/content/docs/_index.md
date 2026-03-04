@@ -11,4 +11,5 @@ Welcome to the Voxclip documentation. Voxclip is a command-line tool for voice c
   {{< card link="commands" title="Commands" icon="terminal" subtitle="Full command and flag reference." >}}
   {{< card link="recording-backends" title="Recording Backends" icon="microphone" subtitle="Backend selection and device configuration." >}}
   {{< card link="troubleshooting" title="Troubleshooting" icon="exclamation-circle" subtitle="Common issues and how to resolve them." >}}
+  {{< card link="examples" title="Examples" icon="light-bulb" subtitle="Voice-prompt workflows for coding agents and system-wide voice-to-text." >}}
 {{< /cards >}}

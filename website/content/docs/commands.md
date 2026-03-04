@@ -12,6 +12,7 @@ weight: 3
 | `voxclip transcribe <audio-file>` | Transcribe existing audio |
 | `voxclip devices` | List recording devices and backend diagnostics |
 | `voxclip setup` | Download and verify model assets |
+| `voxclip version` | Show version information |
 
 For complete flag reference, run `voxclip --help` and `voxclip <command> --help`.
 
@@ -21,7 +22,7 @@ These flags apply to the main `voxclip` command:
 
 | Flag | Description |
 |------|-------------|
-| `--model <name\|path>` | Select a model name or local model path |
+| `--model <name\|path>` | Select a model name (tiny, base, small, medium, large-v3) or local model path (default: small on macOS, tiny on Linux) |
 | `--model-dir <path>` | Override model storage directory |
 | `--language <auto\|en\|de\|...>` | Set transcription language |
 | `--auto-download` | Automatically download a missing model |
@@ -29,10 +30,12 @@ These flags apply to the main `voxclip` command:
 | `--input <selector>` | Choose input device |
 | `--input-format <pulse\|alsa>` | Force ffmpeg input format on Linux |
 | `--copy-empty` | Copy blank transcripts to clipboard |
+| `--copy-newline` | Append a trailing newline to the clipboard text |
 | `--silence-gate` | Enable near-silent WAV detection before transcription |
 | `--silence-threshold-dbfs <value>` | Set silence-gate threshold |
 | `--duration <duration>` | Set fixed recording duration (e.g. `10s`) |
 | `--immediate` | Start recording immediately |
+| `--pid-file <path>` | Write PID to file and wait for SIGUSR1 to stop recording (for toggle-style hotkey workflows) |
 | `--no-progress` | Disable spinner/progress indicators |
 | `--verbose` | Enable verbose logs |
 | `--json` | Output logs in JSON format |

@@ -10,7 +10,7 @@ After [installing Voxclip](../installation), follow these steps to make your fir
 ### Verify the installation
 
 ```bash
-voxclip --version
+voxclip version
 ```
 
 ### Download a speech model
@@ -27,7 +27,7 @@ This downloads and verifies the default model. Models are stored in:
 ### Record and transcribe
 
 ```bash
-voxclip --language en
+voxclip
 ```
 
 This runs the default flow:
