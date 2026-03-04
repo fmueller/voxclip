@@ -9,9 +9,6 @@
 # Usage:
 #   Bind this script to a global hotkey (see examples/README.md).
 #   Press the hotkey to start recording, press again to stop and paste.
-#
-# Configure model (default: small):
-#   export VOXCLIP_MODEL=tiny
 
 set -e
 
