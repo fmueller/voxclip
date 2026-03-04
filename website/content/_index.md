@@ -78,5 +78,6 @@ Speak into your microphone, press `Ctrl+C` to stop, and the transcript prints in
 
 {{< cards >}}
   {{< card link="docs" title="Documentation" icon="book-open" subtitle="Full command reference, configuration options, and troubleshooting." >}}
+  {{< card link="use-cases" title="Use Cases" icon="microphone" subtitle="Voice prompting for coding agents, system-wide dictation, voice notes, and more." >}}
   {{< card link="https://github.com/fmueller/voxclip" title="GitHub" icon="github" subtitle="Source code, issues, and releases." >}}
 {{< /cards >}}

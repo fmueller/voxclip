@@ -20,6 +20,9 @@ menu:
     - name: Documentation
       pageRef: /docs
       weight: 1
+    - name: Use Cases
+      pageRef: /use-cases
+      weight: 2
     - name: Search
       weight: 3
       params:

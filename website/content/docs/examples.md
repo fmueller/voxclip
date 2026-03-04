@@ -3,6 +3,10 @@ title: Examples
 weight: 6
 ---
 
+{{< callout type="info" >}}
+Looking for a quick overview? Start with the [Use Cases](/use-cases) section for narrative walkthroughs, then come back here for detailed setup and configuration.
+{{< /callout >}}
+
 Voxclip ships with ready-made scripts for voice-prompt workflows with terminal coding agents and system-wide voice-to-text. All processing runs locally — no cloud APIs, no data leaves your machine.
 
 The full script sources live in the [`examples/`](https://github.com/fmueller/voxclip/tree/main/examples) directory.
