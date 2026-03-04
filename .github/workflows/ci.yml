@@ -63,6 +63,8 @@ jobs:
           distribution: goreleaser
           version: '~> v2'
           args: check
+        env:
+          HOMEBREW_TAP_TOKEN: placeholder
 
   unit-tests:
     needs: checks
