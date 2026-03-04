@@ -16,7 +16,7 @@ toc: false
 
 <div class="hx-mb-12">
 <p class="hx-mt-6 hx-text-lg hx-text-gray-600 dark:hx-text-gray-400 sm:hx-text-xl">
-Record audio, transcribe it with open-source speech models, and copy the result to your clipboard — all locally, all in one command.
+A local-first CLI for voice-to-text. Record, transcribe with open-source speech models, and copy to your clipboard — nothing leaves your machine, no cloud APIs, works offline.
 </p>
 </div>
 
@@ -34,13 +34,19 @@ voxclip
 ## Features
 
 {{< cards >}}
-  {{< card link="docs" title="Fully Local" icon="lock-closed" subtitle="No cloud APIs, no data leaves your machine. Powered by open-source whisper.cpp speech models." >}}
-  {{< card link="docs" title="One Command Flow" icon="play" subtitle="Record, transcribe, and copy to clipboard in a single command. No intermediate steps required." >}}
+  {{< card link="docs" title="Fully Local" icon="lock-closed" subtitle="Your audio and transcripts stay on your machine. No accounts, no network requests, works offline after model download." >}}
+  {{< card link="docs" title="One Command Flow" icon="play" subtitle="Record, transcribe, and copy to clipboard in one command. Each step also works independently when you need it." >}}
   {{< card link="docs" title="Cross-Platform" icon="desktop-computer" subtitle="Works on Linux and macOS with automatic backend detection for PipeWire, ALSA, and ffmpeg." >}}
-  {{< card link="docs" title="Clipboard Ready" icon="clipboard-copy" subtitle="Transcripts are automatically copied to your clipboard, ready to paste into any application." >}}
+  {{< card link="docs" title="Clipboard Ready" icon="clipboard-copy" subtitle="Transcripts land on your clipboard automatically — paste into your editor, chat, or coding agent prompt." >}}
   {{< card link="docs/installation" title="Easy Install" icon="download" subtitle="One-line installer script that detects your OS and architecture. No build tools needed." >}}
-  {{< card link="docs/commands" title="Flexible CLI" icon="terminal" subtitle="Composable commands for recording, transcription, device listing, and model management." >}}
+  {{< card link="docs/commands" title="Flexible CLI" icon="terminal" subtitle="Composable subcommands for recording, transcription, and device management. Pipe and script them as you need." >}}
 {{< /cards >}}
+
+## Why local?
+
+Voice data is sensitive. Voxclip processes everything on your hardware so your recordings and transcripts never leave your machine. There are no cloud APIs to configure, no accounts to create, and no ongoing costs. Once the speech model is downloaded, it works without a network connection.
+
+This also means you own the workflow. Subcommands compose freely, scripts are plain shell, and there is no vendor to depend on.
 
 ## Quick Start
 

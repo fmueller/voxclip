@@ -3,7 +3,7 @@ title: Getting Started
 weight: 2
 ---
 
-After [installing Voxclip](../installation), follow these steps to make your first transcription.
+After [installing Voxclip](../installation), follow these steps to make your first transcription. Everything runs locally — no accounts or API keys needed.
 
 {{% steps %}}
 

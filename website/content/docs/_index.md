@@ -3,7 +3,7 @@ title: Documentation
 toc: false
 ---
 
-Welcome to the Voxclip documentation. Voxclip is a command-line tool for voice capture and transcription on Linux and macOS. It runs locally with open-source speech models, and the default flow records audio, transcribes it, and copies the result to your clipboard in one command.
+Welcome to the Voxclip documentation. Voxclip is a local-first CLI for voice capture and transcription on Linux and macOS. It uses open-source whisper.cpp speech models, keeps all processing on your machine, and works offline. The default flow records audio, transcribes it, and copies the result to your clipboard in one command — but each subcommand also works independently.
 
 {{< cards >}}
   {{< card link="installation" title="Installation" icon="download" subtitle="Install Voxclip on Linux or macOS." >}}
