@@ -88,6 +88,13 @@ func TestResolveVersion_DirtyNoTags(t *testing.T) {
 	require.Equal(t, "1.0.0-abcdef-dirty", got)
 }
 
+func TestResolveVersion_DifferentTagThanBase(t *testing.T) {
+	t.Parallel()
+	git := fakeGit("", "v1.0.1-3-g04e7238", fmt.Errorf("no tag"), nil)
+	got := resolveVersion("1.0.0", git)
+	require.Equal(t, "1.0.0-3-g04e7238", got)
+}
+
 func TestRunGitInvalidSubcommand(t *testing.T) {
 	t.Parallel()
 	out, err := runGit("__invalid__")
