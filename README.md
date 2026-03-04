@@ -82,13 +82,13 @@ Voxclip requires a recording backend to capture audio.
 ## Quickstart
 
 ```bash
-voxclip --version
+voxclip version
 voxclip setup
-voxclip --language en
+voxclip
 ```
 
 - `voxclip setup` downloads and verifies the selected model.
-- `voxclip --language en` runs the default flow: record -> transcribe -> copy.
+- `voxclip` runs the default flow: record -> transcribe -> copy.
 - Expected result: transcript prints in the terminal and is copied to your clipboard.
 
 ## Commands
