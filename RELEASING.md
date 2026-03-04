@@ -55,6 +55,15 @@ LICENSE
 THIRD_PARTY_NOTICES.md
 ```
 
+## Pre-tag checklist
+
+Before tagging a release:
+
+1. Update `Version` in `internal/version/version.go` to match the upcoming tag (without the `v` prefix).
+2. Move `CHANGELOG.md` entries from `[Unreleased]` into a dated version section.
+
+The release workflow verifies that the hardcoded version matches the git tag and will fail early if they diverge.
+
 ## GitHub Actions release flow
 
 `.github/workflows/release.yml` runs on version tags (`v*`) and manual dispatch.
