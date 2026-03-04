@@ -23,15 +23,16 @@ var ErrNoBackendAvailable = errors.New("no recording backend available")
 const timedStopGracePeriod = 750 * time.Millisecond
 
 type Config struct {
-	OutputPath  string
-	Duration    time.Duration
-	Interactive bool
-	SampleRate  int
-	Channels    int
-	Input       string
-	Format      string
-	StopCh      <-chan struct{}
-	Logger      *zap.Logger
+	OutputPath         string
+	Duration           time.Duration
+	Interactive        bool
+	SampleRate         int
+	Channels           int
+	Input              string
+	Format             string
+	StopCh             <-chan struct{}
+	InteractiveMessage string
+	Logger             *zap.Logger
 }
 
 type Backend interface {
@@ -193,7 +194,7 @@ func WaitForEnter(in io.Reader, out io.Writer, message string) error {
 	return err
 }
 
-func runInteractiveCommand(ctx context.Context, cmd *exec.Cmd, logger *zap.Logger) error {
+func runInteractiveCommand(ctx context.Context, cmd *exec.Cmd, logger *zap.Logger, stopMessage string) error {
 	if logger == nil {
 		logger = zap.NewNop()
 	}
@@ -202,7 +203,7 @@ func runInteractiveCommand(ctx context.Context, cmd *exec.Cmd, logger *zap.Logge
 		return err
 	}
 
-	if err := WaitForEnter(os.Stdin, os.Stderr, "Recording... press Enter to stop."); err != nil {
+	if err := WaitForEnter(os.Stdin, os.Stderr, stopMessage); err != nil {
 		_ = cmd.Process.Signal(os.Interrupt)
 		_ = cmd.Wait()
 		return err

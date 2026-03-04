@@ -89,7 +89,7 @@ func (b *ffmpegLinuxBackend) Record(ctx context.Context, cfg Config) error {
 		}
 
 		if cfg.Interactive {
-			err := runInteractiveCommand(ctx, cmd, cfg.Logger)
+			err := runInteractiveCommand(ctx, cmd, cfg.Logger, cfg.InteractiveMessage)
 			if err == nil {
 				return nil
 			}
