@@ -34,6 +34,7 @@ type appState struct {
 	input        string
 	inputFormat  string
 	copyEmpty    bool
+	copyNewline  bool
 	silenceGate  bool
 	silenceDBFS  float64
 	duration     time.Duration
@@ -134,6 +135,7 @@ func bindRecordingBackendFlags(cmd *cobra.Command, app *appState) {
 
 func bindCopyAndSilenceFlags(cmd *cobra.Command, app *appState) {
 	cmd.Flags().BoolVar(&app.copyEmpty, "copy-empty", app.copyEmpty, "Copy blank transcripts to clipboard")
+	cmd.Flags().BoolVar(&app.copyNewline, "copy-newline", app.copyNewline, "Append a trailing newline to the clipboard text")
 	cmd.Flags().BoolVar(&app.silenceGate, "silence-gate", app.silenceGate, "Detect near-silent WAV audio and skip transcription")
 	cmd.Flags().Float64Var(&app.silenceDBFS, "silence-threshold-dbfs", app.silenceDBFS, "Silence gate threshold in dBFS")
 }
@@ -202,7 +204,12 @@ func (a *appState) runDefault(ctx context.Context) error {
 		}
 	}
 
-	if err := copyFn(ctx, transcript); err != nil {
+	clipText := transcript
+	if a.copyNewline {
+		clipText += "\n"
+	}
+
+	if err := copyFn(ctx, clipText); err != nil {
 		if errors.Is(err, clipboard.ErrUnavailable) {
 			a.log().Warn("clipboard tool unavailable; transcript left on stdout")
 			return nil

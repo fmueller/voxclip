@@ -3,31 +3,12 @@ package cli
 import (
 	"bytes"
 	"io"
-	"sync"
 	"testing"
 	"time"
 
+	"github.com/fmueller/voxclip/internal/testutil"
 	"github.com/stretchr/testify/require"
 )
-
-// safeBuffer is a goroutine-safe bytes.Buffer for capturing concurrent writes
-// from progress bar goroutines during tests.
-type safeBuffer struct {
-	mu  sync.Mutex
-	buf bytes.Buffer
-}
-
-func (b *safeBuffer) Write(p []byte) (int, error) {
-	b.mu.Lock()
-	defer b.mu.Unlock()
-	return b.buf.Write(p)
-}
-
-func (b *safeBuffer) Bytes() []byte {
-	b.mu.Lock()
-	defer b.mu.Unlock()
-	return bytes.Clone(b.buf.Bytes())
-}
 
 func TestStartSpinnerEnabled(t *testing.T) {
 	t.Parallel()
@@ -73,7 +54,7 @@ func TestStartDurationProgressSubSecondDuration(t *testing.T) {
 
 func TestSpinnerOutputEndsWithCarriageReturn(t *testing.T) {
 	t.Parallel()
-	var buf safeBuffer
+	var buf testutil.SafeBuffer
 	stop := startSpinner(&buf, true, "testing")
 	time.Sleep(300 * time.Millisecond)
 	stop()
@@ -82,12 +63,12 @@ func TestSpinnerOutputEndsWithCarriageReturn(t *testing.T) {
 	require.NotEmpty(t, output, "spinner should have written output")
 	require.True(t, bytes.HasSuffix(output, []byte("\r")),
 		"spinner output must end with carriage return to clear the line, got trailing bytes: %q",
-		trailingBytes(output, 20))
+		testutil.TrailingBytes(output, 20))
 }
 
 func TestDurationProgressOutputEndsWithNewline(t *testing.T) {
 	t.Parallel()
-	var buf safeBuffer
+	var buf testutil.SafeBuffer
 	stop := startDurationProgress(&buf, true, "testing", 5*time.Second)
 	time.Sleep(300 * time.Millisecond)
 	stop()
@@ -96,7 +77,7 @@ func TestDurationProgressOutputEndsWithNewline(t *testing.T) {
 	require.NotEmpty(t, output, "duration progress should have written output")
 	require.True(t, bytes.HasSuffix(output, []byte("\n")),
 		"duration progress output must end with newline to prevent log overlap, got trailing bytes: %q",
-		trailingBytes(output, 20))
+		testutil.TrailingBytes(output, 20))
 }
 
 func TestSpinnerDoubleStopIsSafe(t *testing.T) {
@@ -105,11 +86,4 @@ func TestSpinnerDoubleStopIsSafe(t *testing.T) {
 	time.Sleep(150 * time.Millisecond)
 	stop()
 	stop() // second call must not panic
-}
-
-func trailingBytes(b []byte, n int) []byte {
-	if len(b) <= n {
-		return b
-	}
-	return b[len(b)-n:]
 }

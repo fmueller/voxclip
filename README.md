@@ -107,7 +107,7 @@ Flags are command-scoped. If you pass a flag to a command that does not support 
 
 ### Default-flow flags (`voxclip`)
 
-- `--model <name|path>` select a model name (tiny, base, small, medium, large-v3) or local model path (default: small)
+- `--model <name|path>` select a model name (tiny, base, small, medium, large-v3) or local model path (default: small on macOS, tiny on Linux)
 - `--model-dir <path>` override model storage directory
 - `--language <auto|en|de|...>` set transcription language
 - `--auto-download` automatically download a missing model
@@ -115,6 +115,7 @@ Flags are command-scoped. If you pass a flag to a command that does not support 
 - `--input <selector>` choose input device (for example `:1` on macOS, a PipeWire node ID for `pw-record`, or `hw:1,0` for `arecord`)
 - `--input-format <pulse|alsa>` force ffmpeg input format on Linux
 - `--copy-empty` copy blank transcripts to clipboard
+- `--copy-newline` append a trailing newline to the clipboard text
 - `--silence-gate` enable near-silent WAV detection before transcription
 - `--silence-threshold-dbfs <value>` set silence-gate threshold
 - `--duration <duration>` set fixed recording duration, e.g. `10s`

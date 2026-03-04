@@ -10,9 +10,9 @@ import (
 	"net/http/httptest"
 	"os"
 	"path/filepath"
-	"sync"
 	"testing"
 
+	"github.com/fmueller/voxclip/internal/testutil"
 	"github.com/stretchr/testify/require"
 )
 
@@ -75,25 +75,6 @@ func TestDownloadFileWithChecksumURL(t *testing.T) {
 	require.Equal(t, payload, onDisk)
 }
 
-// safeBuffer is a goroutine-safe bytes.Buffer for capturing concurrent writes
-// from progress bar goroutines during tests.
-type safeBuffer struct {
-	mu  sync.Mutex
-	buf bytes.Buffer
-}
-
-func (b *safeBuffer) Write(p []byte) (int, error) {
-	b.mu.Lock()
-	defer b.mu.Unlock()
-	return b.buf.Write(p)
-}
-
-func (b *safeBuffer) Bytes() []byte {
-	b.mu.Lock()
-	defer b.mu.Unlock()
-	return bytes.Clone(b.buf.Bytes())
-}
-
 func TestDownloadProgressBarOutputEndsWithNewline(t *testing.T) {
 	t.Parallel()
 
@@ -107,7 +88,7 @@ func TestDownloadProgressBarOutputEndsWithNewline(t *testing.T) {
 	}))
 	defer server.Close()
 
-	var progressBuf safeBuffer
+	var progressBuf testutil.SafeBuffer
 	destination := filepath.Join(t.TempDir(), "artifact.bin")
 
 	err := DownloadFile(context.Background(), Options{
@@ -123,14 +104,7 @@ func TestDownloadProgressBarOutputEndsWithNewline(t *testing.T) {
 	require.NotEmpty(t, output, "progress bar should have written output")
 	require.True(t, bytes.HasSuffix(output, []byte("\n")),
 		"download progress bar output must end with newline to prevent log overlap, got trailing bytes: %q",
-		trailingBytes(output, 20))
-}
-
-func trailingBytes(b []byte, n int) []byte {
-	if len(b) <= n {
-		return b
-	}
-	return b[len(b)-n:]
+		testutil.TrailingBytes(output, 20))
 }
 
 func TestResolveExpectedChecksum(t *testing.T) {
