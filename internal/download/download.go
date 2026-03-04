@@ -224,7 +224,7 @@ func downloadOnce(ctx context.Context, opts Options, expectedChecksum string) er
 			progressbar.OptionThrottle(65*time.Millisecond),
 			progressbar.OptionSetRenderBlankState(true),
 			progressbar.OptionSetWriter(os.Stderr),
-			progressbar.OptionClearOnFinish(),
+			progressbar.OptionOnCompletion(func() { fmt.Fprint(os.Stderr, "\n") }),
 		)
 		writer = io.MultiWriter(outFile, hash, bar)
 	}
@@ -235,7 +235,6 @@ func downloadOnce(ctx context.Context, opts Options, expectedChecksum string) er
 
 	if bar != nil {
 		_ = bar.Finish()
-		fmt.Fprint(os.Stderr, "\n")
 	}
 
 	if err := outFile.Sync(); err != nil {
