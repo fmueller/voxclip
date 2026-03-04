@@ -1,6 +1,7 @@
 package download
 
 import (
+	"bytes"
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
@@ -9,6 +10,7 @@ import (
 	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"sync"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -71,6 +73,64 @@ func TestDownloadFileWithChecksumURL(t *testing.T) {
 	onDisk, err := os.ReadFile(destination)
 	require.NoError(t, err)
 	require.Equal(t, payload, onDisk)
+}
+
+// safeBuffer is a goroutine-safe bytes.Buffer for capturing concurrent writes
+// from progress bar goroutines during tests.
+type safeBuffer struct {
+	mu  sync.Mutex
+	buf bytes.Buffer
+}
+
+func (b *safeBuffer) Write(p []byte) (int, error) {
+	b.mu.Lock()
+	defer b.mu.Unlock()
+	return b.buf.Write(p)
+}
+
+func (b *safeBuffer) Bytes() []byte {
+	b.mu.Lock()
+	defer b.mu.Unlock()
+	return bytes.Clone(b.buf.Bytes())
+}
+
+func TestDownloadProgressBarOutputEndsWithNewline(t *testing.T) {
+	t.Parallel()
+
+	payload := bytes.Repeat([]byte("x"), 1024)
+	sum := sha256.Sum256(payload)
+	sumHex := hex.EncodeToString(sum[:])
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Length", fmt.Sprintf("%d", len(payload)))
+		_, _ = w.Write(payload)
+	}))
+	defer server.Close()
+
+	var progressBuf safeBuffer
+	destination := filepath.Join(t.TempDir(), "artifact.bin")
+
+	err := DownloadFile(context.Background(), Options{
+		URL:            server.URL,
+		Destination:    destination,
+		ExpectedSHA256: sumHex,
+		Retries:        1,
+		ProgressWriter: &progressBuf,
+	})
+	require.NoError(t, err)
+
+	output := progressBuf.Bytes()
+	require.NotEmpty(t, output, "progress bar should have written output")
+	require.True(t, bytes.HasSuffix(output, []byte("\n")),
+		"download progress bar output must end with newline to prevent log overlap, got trailing bytes: %q",
+		trailingBytes(output, 20))
+}
+
+func trailingBytes(b []byte, n int) []byte {
+	if len(b) <= n {
+		return b
+	}
+	return b[len(b)-n:]
 }
 
 func TestResolveExpectedChecksum(t *testing.T) {

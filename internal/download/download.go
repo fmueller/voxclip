@@ -28,6 +28,7 @@ type Options struct {
 	ChecksumURL    string
 	Retries        int
 	NoProgress     bool
+	ProgressWriter io.Writer
 	HTTPClient     *http.Client
 	Logger         *zap.Logger
 }
@@ -215,7 +216,11 @@ func downloadOnce(ctx context.Context, opts Options, expectedChecksum string) er
 	writer := io.MultiWriter(outFile, hash)
 
 	var bar *progressbar.ProgressBar
-	if shouldRenderProgress(opts.NoProgress, resp.ContentLength) {
+	progressWriter := opts.ProgressWriter
+	if progressWriter == nil {
+		progressWriter = os.Stderr
+	}
+	if shouldRenderProgress(opts.NoProgress, resp.ContentLength, opts.ProgressWriter != nil, progressWriter) {
 		bar = progressbar.NewOptions64(
 			resp.ContentLength,
 			progressbar.OptionSetDescription("downloading"),
@@ -223,8 +228,8 @@ func downloadOnce(ctx context.Context, opts Options, expectedChecksum string) er
 			progressbar.OptionShowBytes(true),
 			progressbar.OptionThrottle(65*time.Millisecond),
 			progressbar.OptionSetRenderBlankState(true),
-			progressbar.OptionSetWriter(os.Stderr),
-			progressbar.OptionOnCompletion(func() { fmt.Fprint(os.Stderr, "\n") }),
+			progressbar.OptionSetWriter(progressWriter),
+			progressbar.OptionOnCompletion(func() { fmt.Fprint(progressWriter, "\n") }),
 		)
 		writer = io.MultiWriter(outFile, hash, bar)
 	}
@@ -258,12 +263,18 @@ func downloadOnce(ctx context.Context, opts Options, expectedChecksum string) er
 	return nil
 }
 
-func shouldRenderProgress(noProgress bool, contentLength int64) bool {
+func shouldRenderProgress(noProgress bool, contentLength int64, explicitWriter bool, w io.Writer) bool {
 	if noProgress {
 		return false
 	}
 	if contentLength <= 0 {
 		return false
 	}
-	return term.IsTerminal(int(os.Stderr.Fd()))
+	if explicitWriter {
+		return true
+	}
+	if f, ok := w.(interface{ Fd() uintptr }); ok {
+		return term.IsTerminal(int(f.Fd()))
+	}
+	return false
 }

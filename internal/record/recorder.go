@@ -183,7 +183,7 @@ func WaitForEnter(in io.Reader, out io.Writer, message string) error {
 	}
 
 	if message != "" {
-		if _, err := fmt.Fprintln(out, message); err != nil {
+		if _, err := fmt.Fprint(out, message); err != nil {
 			return err
 		}
 	}
