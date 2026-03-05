@@ -159,6 +159,8 @@ If recording starts from the wrong microphone, run `voxclip devices`, find the d
 - Wrong microphone selected -> run `voxclip devices` and set `--input`.
 - Near-silent WAV false positives -> debug with `--silence-gate=false`, then tune `--silence-threshold-dbfs`.
 - Missing recording backend -> install one of `pw-record`, `arecord`, or `ffmpeg`.
+- Clipboard copy on Linux requires either `wl-copy` (Wayland sessions) or `xclip` (X11/XWayland sessions).
+- Transcript output to stdout is intentional (for visibility/piping); clipboard copy is an additional convenience, not a replacement.
 - Missing whisper runtime -> reinstall an official release so `libexec/whisper/whisper-cli` is present.
 
 ## Advanced Runtime Details
