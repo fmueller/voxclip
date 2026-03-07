@@ -74,6 +74,22 @@ apt install ffmpeg        # or dnf install ffmpeg
 
 {{< /tabs >}}
 
+### Clipboard not working on Linux
+
+Clipboard copy on Linux requires either `wl-copy` (Wayland sessions) or `xclip` (X11/XWayland sessions):
+
+```bash
+# Wayland
+apt install wl-clipboard   # provides wl-copy
+
+# X11 / XWayland
+apt install xclip
+```
+
+### Transcript prints to terminal but isn't on clipboard
+
+Transcript output to stdout is intentional — it gives you immediate visibility and allows piping into other commands. Clipboard copy is an additional convenience, not a replacement. If the transcript appears in your terminal but isn't on the clipboard, check the clipboard tool requirements above.
+
 ### Missing whisper runtime
 
 Reinstall from an official release so that `libexec/whisper/whisper-cli` is present alongside the `voxclip` binary. See the [installation guide](../installation) for details.

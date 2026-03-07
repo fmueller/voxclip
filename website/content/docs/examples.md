@@ -108,9 +108,11 @@ export VPROMPT_DURATION=12s
 ```
 
 **Requirements:**
-- **macOS:** nothing extra — `osascript` is built-in.
-- **Linux X11:** `xdotool` (`apt install xdotool` / `dnf install xdotool`).
-- **Linux Wayland:** `wtype` (`apt install wtype`).
+- **macOS:** nothing extra — `osascript` is built-in and voxclip copies to clipboard via `pbcopy`.
+- **Linux X11:** `xclip` for clipboard writes and `xdotool` for simulating the paste keystroke (`apt install xclip xdotool` / `dnf install xclip xdotool`).
+- **Linux Wayland:** `wl-copy` for clipboard writes and `wtype` for simulating the paste keystroke (`apt install wl-clipboard wtype`).
+
+Why both steps are needed: these hotkey scripts only simulate the paste keypress; they do not place text on the clipboard themselves. `voxclip` performs the copy operation, then the script triggers paste into the active window.
 
 ## General Use Cases
 
