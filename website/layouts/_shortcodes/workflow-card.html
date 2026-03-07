@@ -1,0 +1,22 @@
+{{- $title := .Get "title" -}}
+{{- $subtitle := .Get "subtitle" -}}
+{{- $icon := .Get "icon" -}}
+{{- $link := .Get "link" -}}
+{{- $external := hasPrefix $link "http" -}}
+{{- $href := cond (strings.HasPrefix $link "/") ($link | relURL) $link -}}
+
+<a
+  {{ with $link }}href="{{ $href }}"{{ with $external }} target="_blank" rel="noreferrer"{{ end }}{{ end }}
+  class="workflow-card not-prose"
+>
+  <div class="workflow-card-icon">
+    {{- with $icon }}{{ partial "utils/icon.html" (dict "name" . "attributes" "height=1.5rem") }}{{ end -}}
+  </div>
+  <div class="workflow-card-body">
+    <h3>{{ $title }}</h3>
+    <p>{{ $subtitle | markdownify }}</p>
+  </div>
+  <div class="workflow-card-arrow">
+    {{- partial "utils/icon.html" (dict "name" "arrow-right" "attributes" "height=1.25rem") -}}
+  </div>
+</a>
