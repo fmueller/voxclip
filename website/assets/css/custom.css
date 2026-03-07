@@ -6,6 +6,7 @@
   --primary-hue: 160deg;
   --primary-saturation: 85%;
   --primary-lightness: 38%;
+  --hextra-max-content-width: 88rem;
 }
 
 .dark {
@@ -32,7 +33,7 @@ code, pre, .code, kbd {
 }
 
 .hextra-hero-subtitle {
-  margin: 1.5rem 0 2rem 0;
+  margin: 0.2rem 0 1.5rem 0;
 }
 
 /* Hero button row */
@@ -117,19 +118,9 @@ code, pre, .code, kbd {
 /* ===== Section Dividers & Spacing ===== */
 
 .content h2 {
-  border-top: 1px solid #e5e7eb;
   padding-top: 2.5rem;
   margin-top: 3.5rem;
   margin-bottom: 1.5rem;
-}
-
-.dark .content h2 {
-  border-top-color: #374151;
-}
-
-.content h2:first-of-type {
-  border-top: none;
-  padding-top: 0;
 }
 
 /* ===== Feature Cards ===== */
@@ -138,6 +129,19 @@ code, pre, .code, kbd {
   align-items: stretch;
   gap: 1.25rem;
   margin-top: 0.5rem;
+}
+
+/* Stack icon above title */
+.hextra-feature-card h3 {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+/* Remove inline right-padding from icon, add bottom spacing instead */
+.hextra-feature-card h3 > span:first-child {
+  padding-right: 0 !important;
+  margin-bottom: 0.5rem;
 }
 
 .hextra-feature-card {
@@ -173,6 +177,132 @@ code, pre, .code, kbd {
 
 .hextra-steps p + pre {
   margin-top: 0.75rem;
+}
+
+/* ===== Workflow Cards ===== */
+
+.workflow-card {
+  display: grid;
+  grid-template-columns: 3rem 1fr auto;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 1.5rem;
+  position: relative;
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.workflow-card::before {
+  content: "";
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.5) 0%,
+    rgba(255, 255, 255, 0) 100%
+  );
+}
+
+.workflow-card > * {
+  position: relative;
+}
+
+.dark .workflow-card {
+  border-color: #262626;
+}
+
+.dark .workflow-card::before {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.04) 0%,
+    rgba(255, 255, 255, 0) 100%
+  );
+}
+
+.workflow-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border-color: #d1d5db;
+}
+
+.dark .workflow-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  border-color: #404040;
+}
+
+.workflow-card-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6b7280;
+}
+
+.dark .workflow-card-icon {
+  color: #9ca3af;
+}
+
+.workflow-card-body h3 {
+  font-size: 1.125rem;
+  font-weight: 500;
+  line-height: 1.4;
+  margin: 0;
+  color: #111827;
+}
+
+.dark .workflow-card-body h3 {
+  color: #f3f4f6;
+}
+
+.workflow-card-body p {
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: #6b7280;
+  margin: 0.25rem 0 0 0;
+}
+
+.dark .workflow-card-body p {
+  color: #9ca3af;
+}
+
+.workflow-card-arrow {
+  display: flex;
+  align-items: center;
+  color: #9ca3af;
+  transition: transform 0.2s ease;
+}
+
+.dark .workflow-card-arrow {
+  color: #6b7280;
+}
+
+.workflow-card:hover .workflow-card-arrow {
+  transform: translateX(3px);
+  color: #6b7280;
+}
+
+.dark .workflow-card:hover .workflow-card-arrow {
+  color: #9ca3af;
+}
+
+@media (max-width: 640px) {
+  .workflow-card {
+    padding: 1rem 1.25rem;
+    border-radius: 1rem;
+    gap: 0.75rem;
+  }
+
+  .workflow-card-body h3 {
+    font-size: 1rem;
+  }
+
+  .workflow-card-body p {
+    font-size: 0.8125rem;
+  }
 }
 
 /* ===== Bottom CTA Section ===== */
