@@ -17,18 +17,21 @@ enableRobotsTXT: true
 
 menu:
   main:
-    - name: Documentation
-      pageRef: /docs
+    - name: Get Started
+      pageRef: /docs/getting-started
       weight: 1
     - name: Use Cases
       pageRef: /use-cases
       weight: 2
-    - name: Search
+    - name: Documentation
+      pageRef: /docs
       weight: 3
+    - name: Search
+      weight: 4
       params:
         type: search
     - name: GitHub
-      weight: 4
+      weight: 5
       url: "https://github.com/fmueller/voxclip"
       params:
         icon: github

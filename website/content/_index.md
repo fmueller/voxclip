@@ -1,5 +1,5 @@
 ---
-title: Voxclip
+title: ""
 toc: false
 ---
 
@@ -10,45 +10,50 @@ toc: false
 {{< /hextra/hero-badge >}}
 </div>
 
-<div class="hx-mt-6 hx-mb-6">
-<h1 class="hx-mt-2 hx-text-4xl hx-font-bold hx-tracking-tight hx-text-slate-900 dark:hx-text-slate-100 md:hx-text-5xl">Voice capture and transcription<br class="sm:hx-block hx-hidden" /> from your terminal</h1>
+{{< hextra/hero-headline >}}
+  Turn your voice into text,&nbsp;<br class="sm:hx-block hx-hidden" />right from the terminal
+{{< /hextra/hero-headline >}}
+
+{{< hextra/hero-subtitle >}}
+  Record, transcribe, and paste — in a single command.&nbsp;<br class="sm:hx-block hx-hidden" />Everything runs locally. No cloud APIs, no accounts, works offline.
+{{< /hextra/hero-subtitle >}}
+
+<div class="hx-mb-12 hx-mt-8">
+{{< hextra/hero-button text="Get Started" link="docs/getting-started" >}}
+{{< hextra/hero-button text="GitHub" link="https://github.com/fmueller/voxclip" style="background: transparent; color: inherit; border: 1px solid #d1d5db;" >}}
 </div>
 
-<div class="hx-mb-12">
-<p class="hx-mt-6 hx-text-lg hx-text-gray-600 dark:hx-text-gray-400 sm:hx-text-xl">
-A local-first CLI for voice-to-text. Record, transcribe with open-source speech models, and copy to your clipboard — nothing leaves your machine, no cloud APIs, works offline.
-</p>
-</div>
+<div class="install-block">
+
+<p class="install-label">Quick install — Linux & macOS:</p>
 
 ```bash
-# Install
 curl -fsSL https://raw.githubusercontent.com/fmueller/voxclip/main/scripts/install-voxclip.sh | sh
-
-# Setup model and transcribe
-voxclip setup
-voxclip
 ```
 
-<div class="hx-mt-6"></div>
+</div>
 
-## Features
+## Why Voxclip?
 
-{{< cards >}}
-  {{< card link="docs" title="Fully Local" icon="lock-closed" subtitle="Your audio and transcripts stay on your machine. No accounts, no network requests, works offline after model download." >}}
-  {{< card link="docs" title="One Command Flow" icon="play" subtitle="Record, transcribe, and copy to clipboard in one command. Each step also works independently when you need it." >}}
-  {{< card link="docs" title="Cross-Platform" icon="desktop-computer" subtitle="Works on Linux and macOS with automatic backend detection for PipeWire, ALSA, and ffmpeg." >}}
-  {{< card link="docs" title="Clipboard Ready" icon="clipboard-copy" subtitle="Transcripts land on your clipboard automatically — paste into your editor, chat, or coding agent prompt." >}}
-  {{< card link="docs/installation" title="Easy Install" icon="download" subtitle="One-line installer script that detects your OS and architecture. No build tools needed." >}}
-  {{< card link="docs/commands" title="Flexible CLI" icon="terminal" subtitle="Composable subcommands for recording, transcription, and device management. Pipe and script them as you need." >}}
-{{< /cards >}}
+{{< hextra/feature-grid >}}
+  {{< hextra/feature-card
+    title="Private by design"
+    icon="lock-closed"
+    subtitle="No one hears what you say except your own machine. No accounts, no cloud, no data collection — ever."
+  >}}
+  {{< hextra/feature-card
+    title="Works offline"
+    icon="cloud"
+    subtitle="Download a small speech model once, then forget about the internet. Works on planes, in cafés, anywhere."
+  >}}
+  {{< hextra/feature-card
+    title="One command"
+    icon="play"
+    subtitle="`voxclip` — that's it. Speak, press Ctrl+C, and the transcript is on your clipboard ready to paste."
+  >}}
+{{< /hextra/feature-grid >}}
 
-## Why local?
-
-Voice data is sensitive. Voxclip processes everything on your hardware so your recordings and transcripts never leave your machine. There are no cloud APIs to configure, no accounts to create, and no ongoing costs. Once the speech model is downloaded, it works without a network connection.
-
-This also means you own the workflow. Subcommands compose freely, scripts are plain shell, and there is no vendor to depend on.
-
-## Quick Start
+## How it works
 
 {{% steps %}}
 
@@ -58,11 +63,15 @@ This also means you own the workflow. Subcommands compose freely, scripts are pl
 curl -fsSL https://raw.githubusercontent.com/fmueller/voxclip/main/scripts/install-voxclip.sh | sh
 ```
 
+Downloads the correct binary for your OS and architecture. No build tools needed.
+
 ### Download a speech model
 
 ```bash
 voxclip setup
 ```
+
+Fetches an open-source Whisper model (~75 MB). This is a one-time download — after this, everything runs offline.
 
 ### Record and transcribe
 
@@ -70,14 +79,65 @@ voxclip setup
 voxclip
 ```
 
-Speak into your microphone, press `Ctrl+C` to stop, and the transcript prints in the terminal and is copied to your clipboard.
+Speak into your microphone, press `Ctrl+C` to stop. The transcript prints in your terminal and is copied to your clipboard, ready to paste.
 
 {{% /steps %}}
 
-## Learn More
+## Built for real workflows
 
-{{< cards >}}
-  {{< card link="docs" title="Documentation" icon="book-open" subtitle="Full command reference, configuration options, and troubleshooting." >}}
-  {{< card link="use-cases" title="Use Cases" icon="microphone" subtitle="Voice prompting for coding agents, system-wide dictation, voice notes, and more." >}}
-  {{< card link="https://github.com/fmueller/voxclip" title="GitHub" icon="github" subtitle="Source code, issues, and releases." >}}
-{{< /cards >}}
+{{< hextra/feature-grid >}}
+  {{< hextra/feature-card
+    title="Think faster than you type"
+    icon="terminal"
+    subtitle="Speak complex instructions to Claude Code, aider, or any AI tool instead of typing paragraphs. The transcript lands on your clipboard."
+    link="use-cases/voice-prompting"
+  >}}
+  {{< hextra/feature-card
+    title="Dictate anywhere"
+    icon="microphone"
+    subtitle="Press a hotkey, speak, and the transcript is pasted into whatever app is active — browser, email, chat. No cloud, no app switching."
+    link="use-cases/dictation"
+  >}}
+  {{< hextra/feature-card
+    title="Capture ideas without breaking flow"
+    icon="document-text"
+    subtitle="Speak a thought mid-task and it's saved as a timestamped line in a plain text file. No context switch, no friction."
+    link="use-cases/voice-notes"
+  >}}
+{{< /hextra/feature-grid >}}
+
+## Features
+
+{{< hextra/feature-grid cols="2" >}}
+  {{< hextra/feature-card
+    title="Cross-platform"
+    icon="desktop-computer"
+    subtitle="Works on Linux and macOS with automatic backend detection for PipeWire, ALSA, and ffmpeg."
+    link="docs/recording-backends"
+  >}}
+  {{< hextra/feature-card
+    title="Clipboard integration"
+    icon="clipboard-copy"
+    subtitle="Transcripts land on your clipboard automatically — paste into your editor, chat, or terminal."
+    link="docs/commands"
+  >}}
+  {{< hextra/feature-card
+    title="Composable CLI"
+    icon="terminal"
+    subtitle="Subcommands for recording, transcription, and device management. Pipe and script them as you need."
+    link="docs/commands"
+  >}}
+  {{< hextra/feature-card
+    title="Open-source models"
+    icon="code"
+    subtitle="Powered by OpenAI's Whisper models running locally via whisper.cpp. No proprietary dependencies."
+    link="docs/getting-started"
+  >}}
+{{< /hextra/feature-grid >}}
+
+## Get started
+
+<div class="hx-mt-6">
+{{< hextra/hero-button text="Installation Guide" link="docs/installation" >}}
+{{< hextra/hero-button text="Documentation" link="docs" style="background: transparent; color: inherit; border: 1px solid #d1d5db;" >}}
+</div>

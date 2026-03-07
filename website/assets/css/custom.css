@@ -1,0 +1,187 @@
+/* ===== Fonts ===== */
+
+:root {
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-code: 'JetBrains Mono', ui-monospace, monospace;
+  --primary-hue: 160deg;
+  --primary-saturation: 85%;
+  --primary-lightness: 38%;
+}
+
+.dark {
+  --primary-hue: 160deg;
+  --primary-saturation: 80%;
+  --primary-lightness: 48%;
+}
+
+body {
+  font-family: var(--font-body);
+}
+
+code, pre, .code, kbd {
+  font-family: var(--font-code);
+  font-feature-settings: "liga" 1;
+}
+
+/* ===== Hero Section ===== */
+
+.hextra-hero-headline {
+  font-size: clamp(2rem, 5vw, 3.75rem);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.hextra-hero-subtitle {
+  margin: 1.5rem 0 2rem 0;
+}
+
+/* Hero button row */
+.hx-mb-12 {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+/* Hero button hover lift */
+.hextra-hero-button {
+  transition: background-color 0.2s ease, transform 0.15s ease;
+}
+
+.hextra-hero-button:hover {
+  transform: translateY(-1px);
+}
+
+/* Secondary (outline) hero buttons via inline style attribute */
+.hextra-hero-button[style*="transparent"] {
+  transition: border-color 0.2s ease, background-color 0.2s ease, transform 0.15s ease;
+}
+
+.hextra-hero-button[style*="transparent"]:hover {
+  border-color: hsl(160, 85%, 38%) !important;
+  background-color: hsla(160, 85%, 38%, 0.06) !important;
+  transform: translateY(-1px);
+}
+
+.dark .hextra-hero-button[style*="transparent"] {
+  border-color: #4b5563 !important;
+}
+
+.dark .hextra-hero-button[style*="transparent"]:hover {
+  border-color: hsl(160, 80%, 48%) !important;
+  background-color: hsla(160, 80%, 48%, 0.08) !important;
+}
+
+/* ===== Install Block ===== */
+
+.install-block {
+  max-width: 600px;
+  margin: 2rem auto 2rem auto;
+}
+
+.install-label {
+  text-align: center;
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin-bottom: 0.5rem;
+}
+
+.dark .install-label {
+  color: #9ca3af;
+}
+
+@media (max-width: 640px) {
+  .install-block {
+    max-width: 100%;
+  }
+}
+
+.install-block pre {
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  border-radius: 0.5rem;
+}
+
+.dark .install-block pre {
+  border-color: #374151;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+/* ===== Hide Heading Anchor # ===== */
+
+.content .subheading-anchor::after {
+  --tw-content: none;
+  content: none !important;
+}
+
+/* ===== Section Dividers & Spacing ===== */
+
+.content h2 {
+  border-top: 1px solid #e5e7eb;
+  padding-top: 2.5rem;
+  margin-top: 3.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.dark .content h2 {
+  border-top-color: #374151;
+}
+
+.content h2:first-of-type {
+  border-top: none;
+  padding-top: 0;
+}
+
+/* ===== Feature Cards ===== */
+
+.hextra-feature-grid {
+  align-items: stretch;
+  gap: 1.25rem;
+  margin-top: 0.5rem;
+}
+
+.hextra-feature-card {
+  height: 100%;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hextra-feature-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.dark .hextra-feature-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+@media (max-width: 640px) {
+  .hextra-feature-card {
+    padding: 1rem;
+  }
+}
+
+/* ===== Steps Component ===== */
+
+.steps .step-number,
+.steps h3::before {
+  font-family: var(--font-body);
+}
+
+.hextra-steps pre + p {
+  margin-top: 1rem;
+}
+
+.hextra-steps p + pre {
+  margin-top: 0.75rem;
+}
+
+/* ===== Bottom CTA Section ===== */
+
+.content > div:last-child {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  margin-top: 1.5rem;
+  padding-bottom: 3rem;
+}
