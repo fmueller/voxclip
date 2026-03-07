@@ -20,12 +20,11 @@ toc: false
 
 <div class="hx-mb-12 hx-mt-8">
 {{< hextra/hero-button text="Get Started" link="docs/getting-started" >}}
-{{< hextra/hero-button text="GitHub" link="https://github.com/fmueller/voxclip" style="background: transparent; color: inherit; border: 1px solid #d1d5db;" >}}
 </div>
 
 <div class="install-block">
 
-<p class="install-label">Quick install — Linux & macOS:</p>
+<p class="install-label">Quick install - Linux & macOS:</p>
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/fmueller/voxclip/main/scripts/install-voxclip.sh | sh
@@ -85,26 +84,26 @@ Speak into your microphone, press `Ctrl+C` to stop. The transcript prints in you
 
 ## Built for real workflows
 
-{{< hextra/feature-grid >}}
-  {{< hextra/feature-card
+{{< workflow-grid >}}
+  {{< workflow-card
     title="Think faster than you type"
     icon="terminal"
     subtitle="Speak complex instructions to Claude Code, aider, or any AI tool instead of typing paragraphs. The transcript lands on your clipboard."
     link="use-cases/voice-prompting"
   >}}
-  {{< hextra/feature-card
+  {{< workflow-card
     title="Dictate anywhere"
     icon="microphone"
     subtitle="Press a hotkey, speak, and the transcript is pasted into whatever app is active — browser, email, chat. No cloud, no app switching."
     link="use-cases/dictation"
   >}}
-  {{< hextra/feature-card
-    title="Capture ideas without breaking flow"
+  {{< workflow-card
+    title="Never lose a thought"
     icon="document-text"
     subtitle="Speak a thought mid-task and it's saved as a timestamped line in a plain text file. No context switch, no friction."
     link="use-cases/voice-notes"
   >}}
-{{< /hextra/feature-grid >}}
+{{< /workflow-grid >}}
 
 ## Features
 

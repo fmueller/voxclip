@@ -52,7 +52,7 @@ params:
     displayPoweredBy: false
 
   page:
-    width: normal
+    width: wide
 
   search:
     enable: true
