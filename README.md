@@ -23,6 +23,15 @@ Voxclip is a command-line tool for voice capture and transcription on Linux and 
 
 Voxclip is installed from release artifacts. There is intentionally no `voxclip install` command.
 
+### Homebrew (macOS)
+
+```bash
+brew tap fmueller/tap
+brew install voxclip
+```
+
+The formula installs `voxclip` and the bundled whisper runtime. Run `voxclip setup` after install to download a speech model.
+
 ### Installer script (recommended)
 
 **Default**
