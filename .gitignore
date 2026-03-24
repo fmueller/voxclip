@@ -4,6 +4,7 @@
 # Binaries for programs and plugins
 dist/
 /voxclip
+release-notes.md
 packaging/whisper/*/whisper-cli
 packaging/whisper/*/whisper-cli.exe
 *.exe
