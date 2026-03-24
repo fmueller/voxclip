@@ -47,7 +47,7 @@ checksum:
 changelog:
   disable: true
 
-brews:
+homebrew_casks:
   - name: voxclip
     ids:
       - voxclip
@@ -56,17 +56,12 @@ brews:
       name: homebrew-tap
       branch: main
       token: "{{ .Env.HOMEBREW_TAP_TOKEN }}"
-    directory: Formula
+    directory: Casks
     homepage: "https://github.com/fmueller/voxclip"
     description: "Voice capture and transcription CLI — record, transcribe, and copy to clipboard locally"
-    license: "MIT"
     skip_upload: auto
+    binaries:
+      - voxclip
     dependencies:
-      - name: ffmpeg
-        os: mac
-    install: |
-      bin.install "voxclip"
-      (libexec/"whisper").mkpath
-      (libexec/"whisper").install "libexec/whisper/whisper-cli"
-    test: |
-      system bin/"voxclip", "--version"
+      - formula: ffmpeg
+    caveats: "Run `voxclip setup` after install to download a speech model."

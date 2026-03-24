@@ -36,6 +36,10 @@ func NewBundledEngine(logger *zap.Logger) (*BundledEngine, error) {
 	if err != nil {
 		return nil, fmt.Errorf("resolve voxclip executable path: %w", err)
 	}
+	voxclipExe, err = filepath.EvalSymlinks(voxclipExe)
+	if err != nil {
+		return nil, fmt.Errorf("resolve voxclip executable symlinks: %w", err)
+	}
 
 	whisperExe, err := ResolveBundledEnginePath(voxclipExe)
 	if err != nil {
