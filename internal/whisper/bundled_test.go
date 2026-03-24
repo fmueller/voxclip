@@ -30,6 +30,24 @@ func TestResolveBundledEnginePathFindsLibexecSibling(t *testing.T) {
 	require.Equal(t, enginePath, resolved)
 }
 
+func TestResolveBundledEnginePathFindsFlatLayout(t *testing.T) {
+	t.Parallel()
+
+	// Simulates Homebrew cask extraction where voxclip and libexec/ are siblings
+	root := t.TempDir()
+	voxclip := filepath.Join(root, "voxclip")
+	require.NoError(t, os.WriteFile(voxclip, []byte(""), 0o755))
+
+	engineDir := filepath.Join(root, "libexec", "whisper")
+	require.NoError(t, os.MkdirAll(engineDir, 0o755))
+	enginePath := filepath.Join(engineDir, engineBinaryName())
+	require.NoError(t, os.WriteFile(enginePath, []byte(""), 0o755))
+
+	resolved, err := ResolveBundledEnginePath(voxclip)
+	require.NoError(t, err)
+	require.Equal(t, enginePath, resolved)
+}
+
 func TestResolveBundledEnginePathMissing(t *testing.T) {
 	t.Parallel()
 

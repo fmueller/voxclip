@@ -27,10 +27,10 @@ Voxclip is installed from release artifacts. There is intentionally no `voxclip 
 
 ```bash
 brew tap fmueller/tap
-brew install voxclip
+brew install --cask voxclip
 ```
 
-The formula installs `voxclip` and the bundled whisper runtime. Run `voxclip setup` after install to download a speech model.
+The cask installs `voxclip` and the bundled whisper runtime. Run `voxclip setup` after install to download a speech model.
 
 ### Installer script (recommended)
 
