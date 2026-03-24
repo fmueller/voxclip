@@ -50,3 +50,4 @@ jobs:
           enable-purge-pull-zone: true
           access-key: ${{ secrets.BUNNY_ACCESS_KEY }}
           pull-zone-id: ${{ vars.BUNNY_PULL_ZONE_ID }}
+          concurrency: "50"
