@@ -51,3 +51,4 @@ jobs:
           access-key: ${{ secrets.BUNNY_ACCESS_KEY }}
           pull-zone-id: ${{ vars.BUNNY_PULL_ZONE_ID }}
           concurrency: "50"
+          replication-timeout: "15000"
