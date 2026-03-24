@@ -19,7 +19,7 @@ toc: false
 {{< /hextra/hero-subtitle >}}
 
 <div class="hx-mb-12 hx-mt-8">
-{{< hextra/hero-button text="Get Started" link="docs/getting-started" >}}
+{{< hextra/hero-button text="Get Started" link="/docs/getting-started" >}}
 </div>
 
 <div class="install-block">
@@ -89,19 +89,19 @@ Speak into your microphone, press Enter to stop. The transcript prints in your t
     title="Think faster than you type"
     icon="terminal"
     subtitle="Speak complex instructions to Claude Code, aider, or any AI tool instead of typing paragraphs. The transcript lands on your clipboard."
-    link="use-cases/voice-prompting"
+    link="/use-cases/voice-prompting"
   >}}
   {{< workflow-card
     title="Dictate anywhere"
     icon="microphone"
     subtitle="Press a hotkey, speak, and the transcript is pasted into whatever app is active — browser, email, chat. No cloud, no app switching."
-    link="use-cases/dictation"
+    link="/use-cases/dictation"
   >}}
   {{< workflow-card
     title="Never lose a thought"
     icon="document-text"
     subtitle="Speak a thought mid-task and it's saved as a timestamped line in a plain text file. No context switch, no friction."
-    link="use-cases/voice-notes"
+    link="/use-cases/voice-notes"
   >}}
 {{< /workflow-grid >}}
 
@@ -112,31 +112,31 @@ Speak into your microphone, press Enter to stop. The transcript prints in your t
     title="Cross-platform"
     icon="desktop-computer"
     subtitle="Works on Linux and macOS with automatic backend detection for PipeWire, ALSA, and ffmpeg."
-    link="docs/recording-backends"
+    link="/docs/recording-backends"
   >}}
   {{< hextra/feature-card
     title="Clipboard integration"
     icon="clipboard-copy"
     subtitle="Transcripts land on your clipboard automatically — paste into your editor, chat, or terminal."
-    link="docs/commands"
+    link="/docs/commands"
   >}}
   {{< hextra/feature-card
     title="Composable CLI"
     icon="terminal"
     subtitle="Subcommands for recording, transcription, and device management. Pipe and script them as you need."
-    link="docs/commands"
+    link="/docs/commands"
   >}}
   {{< hextra/feature-card
     title="Open-source models"
     icon="code"
     subtitle="Powered by OpenAI's Whisper models running locally via whisper.cpp. No proprietary dependencies."
-    link="docs/getting-started"
+    link="/docs/getting-started"
   >}}
 {{< /hextra/feature-grid >}}
 
 ## Get started
 
 <div class="hx-mt-6">
-{{< hextra/hero-button text="Installation Guide" link="docs/installation" >}}
-{{< hextra/hero-button text="Documentation" link="docs" style="background: transparent; color: inherit; border: 1px solid #d1d5db;" >}}
+{{< hextra/hero-button text="Installation Guide" link="/docs/installation" >}}
+{{< hextra/hero-button text="Documentation" link="/docs" style="background: transparent; color: inherit; border: 1px solid #d1d5db;" >}}
 </div>
