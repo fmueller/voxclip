@@ -48,7 +48,7 @@ curl -fsSL https://raw.githubusercontent.com/fmueller/voxclip/main/scripts/insta
   {{< hextra/feature-card
     title="One command"
     icon="play"
-    subtitle="`voxclip` — that's it. Speak, press Ctrl+C, and the transcript is on your clipboard ready to paste."
+    subtitle="`voxclip` — that's it. Speak, press Enter, and the transcript is on your clipboard ready to paste."
   >}}
 {{< /hextra/feature-grid >}}
 
@@ -70,7 +70,7 @@ Downloads the correct binary for your OS and architecture. No build tools needed
 voxclip setup
 ```
 
-Fetches an open-source Whisper model (~75 MB). This is a one-time download — after this, everything runs offline.
+Downloads and verifies the default speech model. This is a one-time download — after that, everything runs offline.
 
 ### Record and transcribe
 
@@ -78,7 +78,7 @@ Fetches an open-source Whisper model (~75 MB). This is a one-time download — a
 voxclip
 ```
 
-Speak into your microphone, press `Ctrl+C` to stop. The transcript prints in your terminal and is copied to your clipboard, ready to paste.
+Speak into your microphone, press Enter to stop. The transcript prints in your terminal and is copied to your clipboard, ready to paste.
 
 {{% /steps %}}
 

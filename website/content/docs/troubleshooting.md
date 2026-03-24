@@ -93,3 +93,9 @@ Transcript output to stdout is intentional — it gives you immediate visibility
 ### Missing whisper runtime
 
 Reinstall from an official release so that `libexec/whisper/whisper-cli` is present alongside the `voxclip` binary. See the [installation guide](../installation) for details.
+
+To override the whisper runtime location, set the `VOXCLIP_WHISPER_PATH` environment variable:
+
+```bash
+export VOXCLIP_WHISPER_PATH=/path/to/whisper-cli
+```

@@ -19,7 +19,7 @@ voxclip version
 voxclip setup
 ```
 
-This downloads and verifies the default model. Models are stored in:
+This downloads and verifies the default model (tiny on Linux, small on macOS). Models are stored in:
 
 - **Linux:** `$XDG_DATA_HOME/voxclip/models` or `~/.local/share/voxclip/models`
 - **macOS:** `~/Library/Application Support/voxclip/models`
@@ -36,7 +36,7 @@ This runs the default flow:
 2. **Transcribe** — processes the audio with the speech model
 3. **Copy** — puts the transcript on your clipboard
 
-Press `Ctrl+C` to stop recording. The transcript prints in the terminal and is copied to your clipboard.
+Press Enter to start recording, then Enter again to stop. The transcript prints in the terminal and is copied to your clipboard.
 
 {{% /steps %}}
 

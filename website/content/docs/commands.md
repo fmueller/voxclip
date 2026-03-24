@@ -16,6 +16,18 @@ weight: 3
 
 For complete flag reference, run `voxclip --help` and `voxclip <command> --help`.
 
+## Models
+
+| Model | Approx. size | Default on |
+|-------|-------------|------------|
+| tiny | 75 MB | Linux |
+| base | 142 MB | |
+| small | 466 MB | macOS |
+| medium | 1.5 GB | |
+| large-v3 | 3.1 GB | |
+
+Select a model with `--model <name>` or pass a local file path.
+
 ## Default-flow flags
 
 These flags apply to the main `voxclip` command:
