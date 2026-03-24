@@ -135,14 +135,36 @@ code, pre, .code, kbd {
 .hextra-cards {
   display: grid !important;
   grid-template-columns: repeat(auto-fill, minmax(max(250px, calc((100% - 1rem * 2) / var(--hextra-cards-grid-cols, 3))), 1fr)) !important;
+  grid-template-rows: auto;
   align-items: stretch;
 }
 
 .hextra-card {
   height: 100%;
+  display: grid !important;
+  grid-template-rows: subgrid;
+  grid-row: span 3;
 }
 
-/* Stack icon above title */
+/* Pin card content to the top instead of bottom */
+.hextra-card > div {
+  margin-top: 0 !important;
+  display: grid;
+  grid-template-rows: subgrid;
+  grid-row: span 3;
+}
+
+/* Stack icon above title in card shortcode */
+.hextra-card-icon {
+  flex-direction: column !important;
+  align-self: start;
+}
+
+.hextra-card-subtitle {
+  align-self: start;
+}
+
+/* Stack icon above title in feature cards */
 .hextra-feature-card h3 {
   display: flex;
   flex-direction: column;
