@@ -3,7 +3,16 @@ title: Installation
 weight: 1
 ---
 
-Voxclip is installed from release artifacts. There is intentionally no `voxclip install` command.
+Voxclip runs on Linux and macOS. It is installed from release artifacts — there is intentionally no `voxclip install` command.
+
+## Homebrew
+
+```bash
+brew tap fmueller/tap
+brew install --cask voxclip
+```
+
+The cask installs `voxclip` and the bundled whisper runtime. Run `voxclip setup` after install to download a speech model.
 
 ## Installer script (recommended)
 

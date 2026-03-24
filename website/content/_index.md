@@ -24,7 +24,13 @@ toc: false
 
 <div class="install-block">
 
-<p class="install-label">Quick install - Linux & macOS:</p>
+<p class="install-label">Quick install (Homebrew):</p>
+
+```bash
+brew tap fmueller/tap && brew install --cask voxclip
+```
+
+<p class="install-label">Quick install (script):</p>
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/fmueller/voxclip/main/scripts/install-voxclip.sh | sh
@@ -57,6 +63,14 @@ curl -fsSL https://raw.githubusercontent.com/fmueller/voxclip/main/scripts/insta
 {{% steps %}}
 
 ### Install Voxclip
+
+**Homebrew:**
+
+```bash
+brew tap fmueller/tap && brew install --cask voxclip
+```
+
+**Script:**
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/fmueller/voxclip/main/scripts/install-voxclip.sh | sh
