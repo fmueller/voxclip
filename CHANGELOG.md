@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-03-24
+
 ### Added
 
 - Homebrew cask support: `brew tap fmueller/tap && brew install --cask voxclip`.
@@ -53,5 +55,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - PipeWire duration recording no longer depends on `pw-record --duration`; voxclip now stops timed recordings itself for broader version compatibility.
 - Release archives now include `THIRD_PARTY_NOTICES.md` to document dependency licenses for redistribution.
 
+[1.1.0]: https://github.com/fmueller/voxclip/compare/v1.0.1...v1.1.0
 [1.0.1]: https://github.com/fmueller/voxclip/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/fmueller/voxclip/releases/tag/v1.0.0
