@@ -1,0 +1,23 @@
+{{- $enableFooterSwitches := .Store.Get "enableFooterSwitches" | default false -}}
+{{- $displayThemeToggle := site.Params.theme.displayToggle | default true -}}
+{{- $footerSwitchesVisible := and $enableFooterSwitches (or hugo.IsMultilingual $displayThemeToggle) -}}
+
+{{- $copyright := (T "copyright") | default "© 2024 Hextra." -}}
+
+<footer class="hextra-footer hx:bg-gray-100 hx:pb-[env(safe-area-inset-bottom)] hx:dark:bg-neutral-900 hx:print:bg-transparent">
+  {{- if $footerSwitchesVisible -}}
+    <div class="hx:mx-auto hx:flex hx:gap-2 hx:py-2 hx:px-4 hextra-max-footer-width">
+      {{- partial "language-switch.html" (dict "context" .) -}}
+      {{- with $displayThemeToggle }}{{ partial "theme-toggle.html" }}{{ end -}}
+    </div>
+    {{- if or hugo.IsMultilingual $displayThemeToggle -}}
+      <hr class="hx:border-gray-200 hx:dark:border-neutral-800" />
+    {{- end -}}
+  {{- end -}}
+  <div
+    class="hextra-max-footer-width hx:mx-auto hx:flex hx:flex-col hx:items-center hx:gap-2 hx:py-12 hx:px-6 hx:text-gray-600 hx:dark:text-gray-400 hx:sm:flex-row hx:sm:justify-between"
+  >
+    <div class="hx:text-xs">{{ $copyright | markdownify }}</div>
+    <a href="{{ "legal-notice/" | relURL }}" class="hx:text-xs hx:text-gray-600 hx:dark:text-gray-400 hover:hx:text-gray-900 hover:hx:dark:text-gray-200">Legal Notice</a>
+  </div>
+</footer>
