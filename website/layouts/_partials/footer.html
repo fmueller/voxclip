@@ -2,7 +2,7 @@
 {{- $displayThemeToggle := site.Params.theme.displayToggle | default true -}}
 {{- $footerSwitchesVisible := and $enableFooterSwitches (or hugo.IsMultilingual $displayThemeToggle) -}}
 
-{{- $copyright := printf "© %d Felix Müller." now.Year -}}
+{{- $copyright := printf "© %d Felix Müller" now.Year -}}
 
 <footer class="hextra-footer hx:bg-gray-100 hx:pb-[env(safe-area-inset-bottom)] hx:dark:bg-neutral-900 hx:print:bg-transparent">
   {{- if $footerSwitchesVisible -}}
