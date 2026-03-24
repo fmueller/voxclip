@@ -40,7 +40,7 @@ jobs:
         run: hugo --minify
 
       - name: Deploy to BunnyCDN
-        uses: R-J-dev/bunny-deploy@v2
+        uses: R-J-dev/bunny-deploy@v3
         with:
           storage-zone-password: ${{ secrets.BUNNY_STORAGE_ZONE_PASSWORD }}
           directory-to-upload: "website/public"
