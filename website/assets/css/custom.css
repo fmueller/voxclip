@@ -131,6 +131,17 @@ code, pre, .code, kbd {
   margin-top: 0.5rem;
 }
 
+/* Normalize Hextra card grid for consistent alignment */
+.hextra-cards {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(max(250px, calc((100% - 1rem * 2) / var(--hextra-cards-grid-cols, 3))), 1fr)) !important;
+  align-items: stretch;
+}
+
+.hextra-card {
+  height: 100%;
+}
+
 /* Stack icon above title */
 .hextra-feature-card h3 {
   display: flex;
