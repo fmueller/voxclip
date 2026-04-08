@@ -21,8 +21,6 @@ builds:
     ldflags:
       - -s -w
       - -X github.com/fmueller/voxclip/internal/version.Version={{ .Version }}
-      - -X github.com/fmueller/voxclip/internal/version.Commit={{ .Commit }}
-      - -X github.com/fmueller/voxclip/internal/version.Date={{ .Date }}
 
 archives:
   - id: voxclip
