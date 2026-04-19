@@ -16,7 +16,7 @@ func TestPipeWireDurationModeDoesNotUseDurationFlag(t *testing.T) {
 	signalFile := filepath.Join(tempDir, "signal.txt")
 
 	stubPath := filepath.Join(tempDir, "pw-record")
-	stub := "#!/bin/sh\nset -eu\nprintf '%s\\n' \"$@\" > \"$ARGS_FILE\"\ntrap 'touch \"$SIGNAL_FILE\"; exit 0' INT\nwhile :; do sleep 0.02; done\n"
+	stub := "#!/bin/sh\nset -eu\ntrap 'touch \"$SIGNAL_FILE\"; exit 0' INT\nprintf '%s\\n' \"$@\" > \"$ARGS_FILE\"\nwhile :; do sleep 0.02; done\n"
 	require.NoError(t, os.WriteFile(stubPath, []byte(stub), 0o755))
 
 	t.Setenv("PATH", tempDir+":"+os.Getenv("PATH"))
@@ -78,7 +78,7 @@ func TestPipeWireInputPassesTarget(t *testing.T) {
 	signalFile := filepath.Join(tempDir, "signal.txt")
 
 	stubPath := filepath.Join(tempDir, "pw-record")
-	stub := "#!/bin/sh\nset -eu\nprintf '%s\\n' \"$@\" > \"$ARGS_FILE\"\ntrap 'touch \"$SIGNAL_FILE\"; exit 0' INT\nwhile :; do sleep 0.02; done\n"
+	stub := "#!/bin/sh\nset -eu\ntrap 'touch \"$SIGNAL_FILE\"; exit 0' INT\nprintf '%s\\n' \"$@\" > \"$ARGS_FILE\"\nwhile :; do sleep 0.02; done\n"
 	require.NoError(t, os.WriteFile(stubPath, []byte(stub), 0o755))
 
 	t.Setenv("PATH", tempDir+":"+os.Getenv("PATH"))
@@ -110,7 +110,7 @@ func TestPipeWireNoInputOmitsTarget(t *testing.T) {
 	signalFile := filepath.Join(tempDir, "signal.txt")
 
 	stubPath := filepath.Join(tempDir, "pw-record")
-	stub := "#!/bin/sh\nset -eu\nprintf '%s\\n' \"$@\" > \"$ARGS_FILE\"\ntrap 'touch \"$SIGNAL_FILE\"; exit 0' INT\nwhile :; do sleep 0.02; done\n"
+	stub := "#!/bin/sh\nset -eu\ntrap 'touch \"$SIGNAL_FILE\"; exit 0' INT\nprintf '%s\\n' \"$@\" > \"$ARGS_FILE\"\nwhile :; do sleep 0.02; done\n"
 	require.NoError(t, os.WriteFile(stubPath, []byte(stub), 0o755))
 
 	t.Setenv("PATH", tempDir+":"+os.Getenv("PATH"))
