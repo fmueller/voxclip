@@ -7,12 +7,13 @@ import (
 )
 
 func TestResolve_ReturnsVersion(t *testing.T) {
-	t.Parallel()
-	require.Equal(t, Version, Resolve())
+	original := Version
+	Version = "1.2.3-test"
+	t.Cleanup(func() { Version = original })
+	require.Equal(t, "1.2.3-test", Resolve())
 }
 
 func TestResolve_EmptyFallsBackToZero(t *testing.T) {
-	t.Parallel()
 	original := Version
 	Version = ""
 	t.Cleanup(func() { Version = original })
