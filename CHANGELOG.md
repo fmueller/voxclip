@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- `examples/vpaste-toggle.sh` no longer exits on first run under `/bin/sh` with `set -e` when the PID file is absent.
+
+### Changed
+
+- Example docs now include explicit macOS permission steps (Microphone, Accessibility, Automation), hotkey conflict guidance, and troubleshooting notes for `vpaste.sh`/`vpaste-toggle.sh`.
+- Toggle hotkey docs now describe editing script flags directly instead of using undocumented `VOXCLIP_MODEL` environment configuration.
+
 ## [1.1.0] - 2026-03-24
 
 ### Added

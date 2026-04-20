@@ -56,7 +56,20 @@ The recording happens silently — no terminal window opens, no prompts appear. 
 
 1. Open **Shortcuts.app** and create a new shortcut named "Voice Prompt".
 2. Add the action **Run Shell Script**, set shell to `/bin/zsh`, and paste the contents of `vpaste.sh`.
-3. Go to **System Settings > Keyboard > Keyboard Shortcuts > Services** (or App Shortcuts) and assign a key combination (e.g. `Ctrl+Shift+V`) to the "Voice Prompt" shortcut.
+3. Go to **System Settings > Keyboard > Keyboard Shortcuts > Services** (or App Shortcuts) and assign a key combination (for example `Ctrl+Alt+Cmd+V`).
+
+Avoid `Ctrl+Shift+V` and `Cmd+Shift+V` on macOS where editors and terminals often intercept those combos.
+
+### macOS permissions (required for both hotkey scripts)
+
+`vpaste.sh` and `vpaste-toggle.sh` rely on macOS privacy permissions for recording and simulated paste.
+
+1. Run the shortcut once from **Shortcuts.app** (click the Play button) to trigger permission prompts.
+2. Allow **Microphone** access for Shortcuts.
+3. Enable **Accessibility** for Shortcuts so `osascript` can send `Cmd+V`.
+4. Enable **Automation** for Shortcuts to control **System Events**.
+
+If you test from Terminal/iTerm instead of Shortcuts, grant the same permissions to that terminal app.
 
 ### Linux setup (GNOME)
 
@@ -78,7 +91,7 @@ The recording happens silently — no terminal window opens, no prompts appear. 
 
 ### Requirements
 
-- **macOS:** nothing extra — `osascript` is built-in and voxclip copies to clipboard via `pbcopy`.
+- **macOS:** `osascript` is built-in and voxclip copies via `pbcopy`; grant Microphone + Accessibility + Automation permissions as described above.
 - **Linux X11:** `xclip` for clipboard writes and `xdotool` for simulating the paste keystroke (`apt install xclip xdotool` / `dnf install xclip xdotool`).
 - **Linux Wayland:** `wl-copy` for clipboard writes and `wtype` for simulating the paste keystroke (`apt install wl-clipboard wtype`).
 
@@ -123,17 +136,35 @@ Then bind `~/.local/bin/vpaste-toggle` to a global hotkey:
 - **KDE:** System Settings > Shortcuts > Custom Shortcuts
 - **macOS:** Shortcuts.app > Run Shell Script (set shell to `/bin/zsh`)
 
-### Configuration
-
-Set `VOXCLIP_MODEL` to change the model (default: `small`):
+Before binding a silent hotkey, pre-download the model once so first use does not block on background download:
 
 ```bash
-export VOXCLIP_MODEL=tiny
+voxclip setup --model tiny
 ```
+
+### Configuration
+
+Edit your local `vpaste-toggle` copy and adjust the `voxclip` flags directly (for example `--model`, `--language`, or `--input`).
 
 ### Requirements
 
 Same as `vpaste.sh` — see the [requirements section](#requirements) above.
+
+### Troubleshooting hotkey scripts
+
+Run from Terminal to surface hidden errors while iterating:
+
+```bash
+~/.local/bin/vpaste
+~/.local/bin/vpaste-toggle
+```
+
+Common failure modes:
+
+- `System Events got an error ... not allowed to send keystrokes (1002)` -> enable macOS Accessibility permission.
+- Transcript copies but does not paste on Linux -> install `xdotool` (X11) or `wtype` (Wayland).
+- Wrong microphone -> run `voxclip devices` and pass `--input` in your local script copy.
+- Toggle script appears stuck after interrupted run -> remove stale PID file: `rm -f /tmp/voxclip-toggle.pid`.
 
 ## One-shot invocation (non-interactive)
 
