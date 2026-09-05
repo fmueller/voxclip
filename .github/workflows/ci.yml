@@ -38,6 +38,9 @@ jobs:
       - name: Vet
         run: go vet ./...
 
+      - name: Check commit policy guards
+        run: task test:commit-policy
+
       - name: Install go-licenses
         run: go install github.com/google/go-licenses/v2@v2.0.1
 

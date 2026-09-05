@@ -153,7 +153,12 @@ Follow existing conventions and keep CLI UX stable.
 - Do keep branches and PRs focused on one logical change.
 - Do include a clear PR summary with why, what changed, and test evidence.
 - Do keep commits small and descriptive, using imperative commit subjects.
-- Do use conventional commit messages.
+- Do use Conventional Commit subjects in the form `<type>(<scope>): <description>`.
+  Allowed types are `feat`, `fix`, `refactor`, `docs`, `test`, `chore`,
+  `build`, `perf`, and `ci`; the scope is optional.
+- Do install the repository's Lefthook hooks with `task hooks:install`.
+- Don't add agent attribution, co-author trailers, session links, or thread IDs
+  to commit messages, and don't commit with an agent author identity.
 - Do mention user-visible CLI changes and migration notes in the PR body.
 - Don't mix unrelated refactors or formatting-only churn into feature/fix PRs.
 - Don't rewrite the shared branch history unless explicitly requested.

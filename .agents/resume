@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Voxclip has no backing services or wake-time authentication to restore.
+echo "Voxclip orb is ready."

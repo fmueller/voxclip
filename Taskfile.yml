@@ -36,6 +36,28 @@ tasks:
     cmds:
       - bats scripts/install-voxclip_test.bats
 
+  test:commit-msg:
+    desc: Test the commit-message policy
+    cmds:
+      - bash scripts/check-commit-msg-test.sh
+
+  test:author:
+    desc: Test the agent-identity author guard
+    cmds:
+      - bash scripts/check-author-test.sh
+
+  test:push-messages:
+    desc: Test the pre-push commit guard
+    cmds:
+      - bash scripts/check-push-messages-test.sh
+
+  test:commit-policy:
+    desc: Test all commit policy guards
+    cmds:
+      - task: test:commit-msg
+      - task: test:author
+      - task: test:push-messages
+
   test:mutate:
     desc: Run mutation testing with gremlins
     cmds:
@@ -82,3 +104,9 @@ tasks:
       - whisper:build
     cmds:
       - goreleaser build --snapshot --clean --single-target
+
+  hooks:install:
+    desc: Install opt-in Lefthook Git hooks
+    cmds:
+      - git config --local core.hooksPath .git/hooks
+      - lefthook install --force
