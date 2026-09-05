@@ -1,0 +1,19 @@
+# Pinned developer and CI toolchain. Direct Go commands and Taskfile targets
+# remain canonical; mise keeps every environment on the same versions.
+[tools]
+go = "1.26.8"
+task = "3.53.1"
+hugo-extended = "0.165.0"
+goreleaser = "2.18.0"
+lefthook = "2.1.10"
+"go:github.com/google/go-licenses/v2" = "2.0.1"
+"go:github.com/go-gremlins/gremlins/cmd/gremlins" = "0.6.0"
+
+[tasks.setup]
+description = "Provision tools, dependencies, and repository Git hooks"
+run = [
+  "mise install",
+  "go mod download",
+  "go -C website mod download",
+  "task hooks:install",
+]

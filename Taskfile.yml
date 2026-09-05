@@ -26,10 +26,31 @@ tasks:
     cmds:
       - go test -tags=integration ./...
 
-  test:e2e:
-    desc: Run end-to-end transcription test
+  fmt:check:
+    desc: Fail if any Go file needs formatting
     cmds:
-      - go test -tags=e2e ./internal/cli -run '^TestTranscribeEndToEndWithFSDD$' -count=1
+      - |
+        out="$(gofmt -l .)"
+        if [ -n "$out" ]; then
+          echo "The following files need gofmt:" >&2
+          echo "$out" >&2
+          exit 1
+        fi
+
+  vet:
+    desc: Run Go static analysis
+    cmds:
+      - go vet ./...
+
+  licenses:check:
+    desc: Check dependency licenses
+    cmds:
+      - go-licenses check ./cmd/voxclip --allowed_licenses=Apache-2.0,MIT,BSD-3-Clause,ISC
+
+  test:e2e:
+    desc: Run end-to-end transcription tests
+    cmds:
+      - go test -tags=e2e ./internal/cli -count=1
 
   test:installer:
     desc: Run installer script bats tests
@@ -62,6 +83,11 @@ tasks:
     desc: Run mutation testing with gremlins
     cmds:
       - gremlins unleash
+
+  test:mutate:gate:
+    desc: Run mutation testing with the CI efficacy gate
+    cmds:
+      - gremlins unleash --threshold-efficacy 0.25
 
   run:
     desc: Run voxclip with default flow

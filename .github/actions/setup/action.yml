@@ -1,0 +1,27 @@
+name: Setup toolchain
+description: Provision the mise-pinned toolchain and restore Go caches.
+
+runs:
+  using: composite
+  steps:
+    - name: Provision toolchain
+      uses: jdx/mise-action@v4
+      with:
+        version: 2026.9.0
+        cache: true
+
+    - name: Resolve Go cache paths
+      shell: bash
+      run: |
+        echo "GO_MOD_CACHE=$(go env GOMODCACHE)" >> "$GITHUB_ENV"
+        echo "GO_BUILD_CACHE=$(go env GOCACHE)" >> "$GITHUB_ENV"
+
+    - name: Cache Go modules and build output
+      uses: actions/cache@v5
+      with:
+        path: |
+          ${{ env.GO_MOD_CACHE }}
+          ${{ env.GO_BUILD_CACHE }}
+        key: ${{ runner.os }}-${{ runner.arch }}-go-${{ hashFiles('go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-${{ runner.arch }}-go-

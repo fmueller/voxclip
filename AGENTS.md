@@ -16,6 +16,7 @@ Guidance for coding agents working in the Voxclip repository.
 
 ## Toolchain and environment
 - Go version: `1.26` (`go.mod`).
+- Pinned development and CI tools: `mise.toml`.
 - `task` is optional convenience; Go commands are the source of truth.
 - Prefer commands that mirror CI.
 

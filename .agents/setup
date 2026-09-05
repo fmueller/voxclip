@@ -1,135 +1,61 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-GO_VERSION="1.26.8"
-HUGO_VERSION="0.165.0"
-TASK_VERSION="3.53.1"
-GORELEASER_VERSION="2.18.0"
-LEFTHOOK_VERSION="2.1.10"
-
 step() {
   local label="$1"
   shift
-  echo "==> ${label}"
-  time "$@"
+  local started=$SECONDS
+  printf '==> %s\n' "$label"
+  "$@"
+  printf '    completed in %ss\n' "$((SECONDS - started))"
 }
 
-install_archive_binary() {
-  local name="$1"
-  local version_check="$2"
-  local url="$3"
-  local archive_path="$4"
-
-  if eval "$version_check" >/dev/null 2>&1; then
-    return
-  fi
-
-  local tmp_dir
-  tmp_dir="$(mktemp -d)"
-  curl -fsSL "$url" -o "$tmp_dir/archive.tar.gz"
-  tar -xzf "$tmp_dir/archive.tar.gz" -C "$tmp_dir"
-  install -m 0755 "$tmp_dir/$archive_path" "$HOME/.local/bin/$name"
-  rm -rf "$tmp_dir"
-}
-
-install_go_tool() {
-  local module="$1"
-  local package="$2"
-  local version="$3"
-  local binary="$4"
-
-  if [[ -x "$HOME/.local/bin/$binary" ]] &&
-    go version -m "$HOME/.local/bin/$binary" 2>/dev/null |
-      grep -Fq $'\tmod\t'"${module}"$'\t'"${version}"; then
-    return
-  fi
-
-  GOBIN="$HOME/.local/bin" go install "${package}@${version}"
-}
-
-mkdir -p "$HOME/.local/bin"
+repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+mise_bin="$HOME/.local/bin/mise"
+mise_version="2026.9.0"
 
 missing_packages=()
 for package in bats build-essential ca-certificates cmake curl ffmpeg file git; do
-  if ! dpkg-query -W -f='${Status}' "$package" 2>/dev/null | grep -Fq "install ok installed"; then
+  if ! dpkg-query -W -f='${Status}' "$package" 2>/dev/null | grep -Fqx 'install ok installed'; then
     missing_packages+=("$package")
   fi
 done
 if ((${#missing_packages[@]})); then
-  step "Install system packages" sudo apt-get update -qq
+  step "Refresh apt metadata" sudo apt-get update -qq
   step "Install system packages: ${missing_packages[*]}" \
     sudo apt-get install -y -qq --no-install-recommends "${missing_packages[@]}"
 fi
 
-case "$(uname -m)" in
-  x86_64)
-    go_arch="amd64"
-    release_arch="x86_64"
-    ;;
-  aarch64|arm64)
-    go_arch="arm64"
-    release_arch="arm64"
-    ;;
-  *)
-    echo "unsupported architecture: $(uname -m)" >&2
-    exit 1
-    ;;
-esac
-
-if ! /usr/local/go/bin/go version 2>/dev/null | grep -Fq "go${GO_VERSION} "; then
-  step "Download Go ${GO_VERSION}" \
-    curl -fsSL "https://go.dev/dl/go${GO_VERSION}.linux-${go_arch}.tar.gz" \
-    -o /tmp/voxclip-go.tar.gz
-  sudo rm -rf /usr/local/go
-  step "Install Go ${GO_VERSION}" sudo tar -C /usr/local -xzf /tmp/voxclip-go.tar.gz
-  rm -f /tmp/voxclip-go.tar.gz
+mkdir -p "$(dirname "$mise_bin")"
+installed_mise_version=""
+if [[ -x "$mise_bin" ]]; then
+  installed_mise_version="$($mise_bin --version | awk '{print $1}')"
+fi
+if [[ "$installed_mise_version" != "$mise_version" ]]; then
+  printf '==> Install mise %s\n' "$mise_version"
+  curl -fsSL https://mise.run | MISE_VERSION="v$mise_version" MISE_INSTALL_PATH="$mise_bin" sh
 fi
 
-export PATH="/usr/local/go/bin:$HOME/.local/bin:$PATH"
+export PATH="$HOME/.local/bin:$PATH"
+cd "$repo_root"
 
-profile_marker="# voxclip orb development tools"
-if ! grep -Fqx "$profile_marker" "$HOME/.bash_profile" 2>/dev/null; then
-  cat >>"$HOME/.bash_profile" <<'EOF'
-
-# voxclip orb development tools
-export PATH="/usr/local/go/bin:$HOME/.local/bin:$PATH"
-EOF
-fi
-
-step "Install Hugo Extended ${HUGO_VERSION}" install_archive_binary \
-  hugo "hugo version | grep -Fq 'v${HUGO_VERSION}'" \
-  "https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_extended_${HUGO_VERSION}_linux-${go_arch}.tar.gz" \
-  hugo
-
-step "Install Task ${TASK_VERSION}" install_archive_binary \
-  task "test \"\$(task --version)\" = '${TASK_VERSION}'" \
-  "https://github.com/go-task/task/releases/download/v${TASK_VERSION}/task_linux_${go_arch}.tar.gz" \
-  task
-
-step "Install GoReleaser ${GORELEASER_VERSION}" install_archive_binary \
-  goreleaser "goreleaser --version | grep -Fq 'GitVersion:    ${GORELEASER_VERSION}'" \
-  "https://github.com/goreleaser/goreleaser/releases/download/v${GORELEASER_VERSION}/goreleaser_Linux_${release_arch}.tar.gz" \
-  goreleaser
-
-step "Install CI Go tools" install_go_tool \
-  github.com/google/go-licenses/v2 \
-  github.com/google/go-licenses/v2 \
-  v2.0.1 \
-  go-licenses
-step "Install mutation test tool" install_go_tool \
-  github.com/go-gremlins/gremlins \
-  github.com/go-gremlins/gremlins/cmd/gremlins \
-  v0.6.0 \
-  gremlins
-step "Install Lefthook ${LEFTHOOK_VERSION}" install_go_tool \
-  github.com/evilmartians/lefthook/v2 \
-  github.com/evilmartians/lefthook/v2 \
-  "v${LEFTHOOK_VERSION}" \
-  lefthook
+step "Install pinned toolchain" "$mise_bin" install --yes
+eval "$("$mise_bin" env -s bash)"
 
 step "Download application modules" go mod download
 step "Download website modules" go -C website mod download
-step "Select repository-local Git hooks" git config --local core.hooksPath .git/hooks
-step "Install Git hooks" lefthook install --force
+step "Install Git hooks" task hooks:install
 
-echo "Orb setup complete."
+profile_marker="# voxclip mise environment"
+if ! grep -Fqx "$profile_marker" "$HOME/.bash_profile" 2>/dev/null; then
+  cat >>"$HOME/.bash_profile" <<EOF
+
+$profile_marker
+if [[ \${PWD:-} == "$repo_root" && -z \${VOXCLIP_MISE_ACTIVE:-} ]]; then
+  export VOXCLIP_MISE_ACTIVE=1
+  eval "\$("$mise_bin" env -s bash)"
+fi
+EOF
+fi
+
+printf 'Orb setup complete in %ss.\n' "$SECONDS"

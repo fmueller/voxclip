@@ -20,35 +20,20 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
-      - name: Setup Go
-        uses: actions/setup-go@v6
-        with:
-          go-version-file: go.mod
-          cache: true
+      - name: Setup toolchain
+        uses: ./.github/actions/setup
 
       - name: Verify formatting
-        run: |
-          fmt_out="$(gofmt -l .)"
-          if [ -n "$fmt_out" ]; then
-            echo "The following files need gofmt:" >&2
-            echo "$fmt_out" >&2
-            exit 1
-          fi
+        run: task fmt:check
 
       - name: Vet
-        run: go vet ./...
+        run: task vet
 
       - name: Check commit policy guards
-        run: |
-          bash scripts/check-commit-msg-test.sh
-          bash scripts/check-author-test.sh
-          bash scripts/check-push-messages-test.sh
-
-      - name: Install go-licenses
-        run: go install github.com/google/go-licenses/v2@v2.0.1
+        run: task test:commit-policy
 
       - name: Check dependency licenses
-        run: go-licenses check ./cmd/voxclip --allowed_licenses=Apache-2.0,MIT,BSD-3-Clause,ISC
+        run: task licenses:check
 
       - name: CLI help smoke test
         run: |
@@ -64,13 +49,7 @@ jobs:
           ./scripts/install-voxclip.sh --help
 
       - name: Validate GoReleaser config
-        uses: goreleaser/goreleaser-action@v7
-        with:
-          distribution: goreleaser
-          version: '~> v2'
-          args: check
-        env:
-          HOMEBREW_TAP_TOKEN: placeholder
+        run: task release:check
 
   unit-tests:
     needs: checks
@@ -83,14 +62,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
-      - name: Setup Go
-        uses: actions/setup-go@v6
-        with:
-          go-version-file: go.mod
-          cache: true
+      - name: Setup toolchain
+        uses: ./.github/actions/setup
 
       - name: Unit tests
-        run: go test ./...
+        run: task test
 
   integration-tests:
     needs: unit-tests
@@ -103,14 +79,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
-      - name: Setup Go
-        uses: actions/setup-go@v6
-        with:
-          go-version-file: go.mod
-          cache: true
+      - name: Setup toolchain
+        uses: ./.github/actions/setup
 
       - name: Integration-tag tests
-        run: go test -tags=integration ./...
+        run: task test:integration
 
   e2e-tests:
     needs: integration-tests
@@ -124,11 +97,8 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
-      - name: Setup Go
-        uses: actions/setup-go@v6
-        with:
-          go-version-file: go.mod
-          cache: true
+      - name: Setup toolchain
+        uses: ./.github/actions/setup
 
       - name: Restore whisper-cli cache
         id: whisper-cache
@@ -156,8 +126,7 @@ jobs:
           go run ./cmd/voxclip setup --model "${VOXCLIP_E2E_MODEL}" --model-dir "${VOXCLIP_E2E_MODEL_DIR}" --no-progress
 
       - name: End-to-end transcription tests
-        run: |
-          go test -tags=e2e ./internal/cli -count=1
+        run: task test:e2e
 
   mutation-tests:
     needs: unit-tests
@@ -166,17 +135,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
-      - name: Setup Go
-        uses: actions/setup-go@v6
-        with:
-          go-version-file: go.mod
-          cache: true
-
-      - name: Install gremlins
-        run: go install github.com/go-gremlins/gremlins/cmd/gremlins@v0.6.0
+      - name: Setup toolchain
+        uses: ./.github/actions/setup
 
       - name: Run mutation tests
-        run: gremlins unleash --threshold-efficacy 0.25
+        run: task test:mutate:gate
 
   installer-tests:
     needs: checks
@@ -188,6 +151,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+
+      - name: Setup toolchain
+        uses: ./.github/actions/setup
 
       - name: Install bats
         run: |
