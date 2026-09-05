@@ -6,6 +6,11 @@ tasks:
     cmds:
       - ./scripts/build-whisper-cli.sh
 
+  e2e:model:warm:
+    desc: Download the configured e2e model into its cache
+    cmds:
+      - go run ./cmd/voxclip setup --model "${VOXCLIP_E2E_MODEL}" --model-dir "${VOXCLIP_E2E_MODEL_DIR}" --no-progress
+
   tidy:
     desc: Tidy Go module dependencies
     cmds:
@@ -25,6 +30,15 @@ tasks:
     desc: Run integration tests
     cmds:
       - go test -tags=integration ./...
+
+  test:cli-help:
+    desc: Smoke test CLI help for every command
+    cmds:
+      - go run ./cmd/voxclip --help
+      - go run ./cmd/voxclip setup --help
+      - go run ./cmd/voxclip record --help
+      - go run ./cmd/voxclip transcribe --help
+      - go run ./cmd/voxclip devices --help
 
   fmt:check:
     desc: Fail if any Go file needs formatting
@@ -57,6 +71,12 @@ tasks:
     cmds:
       - bats scripts/install-voxclip_test.bats
 
+  test:installer:syntax:
+    desc: Check installer syntax and help output
+    cmds:
+      - sh -n scripts/install-voxclip.sh
+      - ./scripts/install-voxclip.sh --help
+
   test:commit-msg:
     desc: Test the commit-message policy
     cmds:
@@ -79,6 +99,43 @@ tasks:
       - task: test:author
       - task: test:push-messages
 
+  commit:check-author:
+    desc: Reject agent commit authors
+    cmds:
+      - bash scripts/check-author.sh
+
+  commit:check-message:
+    desc: Validate a commit message file
+    cmds:
+      - bash scripts/check-commit-msg.sh {{.CLI_ARGS}}
+
+  commit:check-push:
+    desc: Validate commits being pushed
+    cmds:
+      - bash scripts/check-push-messages.sh
+
+  commit:check-conflicts:
+    desc: Reject staged merge markers
+    cmds:
+      - |
+        markers="$(git diff --cached -U0 -- {{.CLI_ARGS}} | grep -E '^\+(<{7}|={7}|>{7})([[:space:]]|$)' || true)"
+        if [ -n "$markers" ]; then
+          echo "unresolved merge markers are staged:" >&2
+          echo "$markers" >&2
+          exit 1
+        fi
+
+  commit:check-gofmt:
+    desc: Reject staged Go files needing formatting
+    cmds:
+      - |
+        unformatted="$(gofmt -l {{.CLI_ARGS}})"
+        if [ -n "$unformatted" ]; then
+          echo "gofmt needed on:" >&2
+          echo "$unformatted" >&2
+          exit 1
+        fi
+
   test:mutate:
     desc: Run mutation testing with gremlins
     cmds:
@@ -88,6 +145,34 @@ tasks:
     desc: Run mutation testing with the CI efficacy gate
     cmds:
       - gremlins unleash --threshold-efficacy 0.25
+
+  ci:export-go-cache:
+    desc: Export Go cache paths for GitHub Actions
+    cmds:
+      - |
+        echo "GO_MOD_CACHE=$(go env GOMODCACHE)" >> "$GITHUB_ENV"
+        echo "GO_BUILD_CACHE=$(go env GOCACHE)" >> "$GITHUB_ENV"
+
+  ci:install-bats:
+    desc: Install Bats on a GitHub-hosted runner
+    cmds:
+      - |
+        if command -v bats >/dev/null 2>&1; then
+          exit 0
+        fi
+        case "$(uname -s)" in
+          Linux)
+            sudo apt-get update -qq
+            sudo apt-get install -y -qq bats
+            ;;
+          Darwin)
+            brew install bats-core
+            ;;
+          *)
+            echo "unsupported CI operating system: $(uname -s)" >&2
+            exit 1
+            ;;
+        esac
 
   run:
     desc: Run voxclip with default flow

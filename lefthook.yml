@@ -4,24 +4,12 @@ pre-commit:
   parallel: true
   commands:
     author-identity:
-      run: bash scripts/check-author.sh
+      run: task commit:check-author
     conflict-markers:
-      run: |
-        markers="$(git diff --cached -U0 -- {staged_files} | grep -E '^\+(<{7}|={7}|>{7})([[:space:]]|$)' || true)"
-        if [ -n "$markers" ]; then
-          echo "unresolved merge markers are staged:" >&2
-          echo "$markers" >&2
-          exit 1
-        fi
+      run: task commit:check-conflicts -- {staged_files}
     gofmt:
       glob: "*.go"
-      run: |
-        unformatted="$(gofmt -l {staged_files})"
-        if [ -n "$unformatted" ]; then
-          echo "gofmt needed on:" >&2
-          echo "$unformatted" >&2
-          exit 1
-        fi
+      run: task commit:check-gofmt -- {staged_files}
     commit-policy-tests:
       glob: "{lefthook.yml,Taskfile.yml,scripts/check-attribution.sh,scripts/check-author.sh,scripts/check-author-test.sh,scripts/check-commit-msg.sh,scripts/check-commit-msg-test.sh,scripts/check-push-messages.sh,scripts/check-push-messages-test.sh}"
       run: task test:commit-policy
@@ -29,9 +17,9 @@ pre-commit:
 commit-msg:
   commands:
     message-policy:
-      run: bash scripts/check-commit-msg.sh {1}
+      run: task commit:check-message -- {1}
 
 pre-push:
   commands:
     message-policy:
-      run: bash scripts/check-push-messages.sh
+      run: task commit:check-push

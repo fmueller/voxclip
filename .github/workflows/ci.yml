@@ -36,17 +36,10 @@ jobs:
         run: task licenses:check
 
       - name: CLI help smoke test
-        run: |
-          go run ./cmd/voxclip --help
-          go run ./cmd/voxclip setup --help
-          go run ./cmd/voxclip record --help
-          go run ./cmd/voxclip transcribe --help
-          go run ./cmd/voxclip devices --help
+        run: task test:cli-help
 
       - name: Installer script syntax check
-        run: |
-          sh -n scripts/install-voxclip.sh
-          ./scripts/install-voxclip.sh --help
+        run: task test:installer:syntax
 
       - name: Validate GoReleaser config
         run: task release:check
@@ -111,7 +104,7 @@ jobs:
 
       - name: Build whisper-cli
         if: steps.whisper-cache.outputs.cache-hit != 'true'
-        run: ./scripts/build-whisper-cli.sh --ref "${WHISPER_REF}"
+        run: task whisper:build
 
       - name: Restore model cache
         uses: actions/cache@v5
@@ -122,8 +115,7 @@ jobs:
             voxclip-model-${{ runner.os }}-${{ env.VOXCLIP_E2E_MODEL }}-
 
       - name: Warm tiny model cache
-        run: |
-          go run ./cmd/voxclip setup --model "${VOXCLIP_E2E_MODEL}" --model-dir "${VOXCLIP_E2E_MODEL_DIR}" --no-progress
+        run: task e2e:model:warm
 
       - name: End-to-end transcription tests
         run: task test:e2e
@@ -156,13 +148,7 @@ jobs:
         uses: ./.github/actions/setup
 
       - name: Install bats
-        run: |
-          if [[ "$RUNNER_OS" == "Linux" ]]; then
-            sudo apt-get update -qq
-            sudo apt-get install -y -qq bats
-          else
-            brew install bats-core
-          fi
+        run: task ci:install-bats
 
       - name: Run installer tests
-        run: bats scripts/install-voxclip_test.bats
+        run: task test:installer
