@@ -33,7 +33,7 @@ ranges="$(collect_ranges "$@")"
 
 commits="$(printf '%s\n' "$ranges" | while read -r range; do
   [ -z "$range" ] && continue
-  git rev-list --max-count=200 "$range"
+  git rev-list "$range"
 done | sort -u)"
 [ -z "$commits" ] && exit 0
 

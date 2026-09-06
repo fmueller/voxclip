@@ -240,6 +240,14 @@ task test:integration
 task test:e2e
 ```
 
+### Commit policy
+
+Install the optional local Git hooks with `task hooks:install`. Ordinary commits
+must use a Conventional Commit subject followed by a blank line and a
+descriptive body that explains intent, context, and non-obvious decisions. Wrap
+body lines at 72 characters. Merge, revert, fixup, and squash commits are
+exempt from the body requirement.
+
 The e2e test requires a built whisper binary path via `VOXCLIP_E2E_WHISPER_PATH`.
 Example:
 

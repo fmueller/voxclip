@@ -26,13 +26,13 @@ commit() {
   git commit -q --no-verify -m "$1"
 }
 
-commit 'feat: add the first fixture' one
+commit $'feat: add the first fixture\n\nAdd the initial fixture used to exercise the push guard.' one
 clean_head="$(git rev-parse HEAD)"
 if ! output="$(bash "$scanner" "$clean_head" 2>&1)"; then
   fail "a clean commit was rejected: $output"
 fi
 
-commit 'add the second fixture' two
+commit $'add the second fixture\n\nAdd a fixture without a Conventional Commit subject.' two
 if output="$(bash "$scanner" "$clean_head..HEAD" 2>&1)"; then
   fail "a non-Conventional Commit was accepted"
 fi
@@ -56,7 +56,7 @@ if ! printf 'refs/heads/main %s refs/heads/main %s\n' "$clean_head" "$clean_head
   fail "the stdin range rejected an empty push"
 fi
 
-commit 'feat: add the third fixture' three
+commit $'feat: add the third fixture\n\nAdd a fixture whose author identity is checked by the push guard.' three
 agent_parent="$(git rev-parse HEAD~1)"
 git commit -q --amend --no-verify --no-edit --author='Amp <amp@ampcode.com>'
 if output="$(bash "$scanner" "$agent_parent..HEAD" 2>&1)"; then
@@ -64,6 +64,18 @@ if output="$(bash "$scanner" "$agent_parent..HEAD" 2>&1)"; then
 fi
 if [[ "$output" != *"agent identity"* ]]; then
   fail "the scanner did not name the author policy: $output"
+fi
+
+git reset -q --hard "$clean_head"
+commit $'invalid subject\n\nThis commit must be scanned even when more than 200 commits are pushed.' invalid
+for i in $(seq 1 200); do
+  commit $'test: add push fixture '"$i"$'\n\nAdd a valid fixture after the older invalid commit.' "fixture $i"
+done
+if output="$(bash "$scanner" "$clean_head..HEAD" 2>&1)"; then
+  fail "a commit beyond the push scan limit was accepted"
+fi
+if [[ "$output" != *"commit message policy"* ]]; then
+  fail "the scanner did not report the older commit policy violation: $output"
 fi
 
 printf 'push message checks passed\n'
