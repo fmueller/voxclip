@@ -1,3 +1,5 @@
+
+
 # Voxclip
 
 [![CI](https://github.com/fmueller/voxclip/actions/workflows/ci.yml/badge.svg)](https://github.com/fmueller/voxclip/actions/workflows/ci.yml)
@@ -26,7 +28,7 @@ Voxclip is installed from release artifacts. There is intentionally no `voxclip 
 ### Homebrew
 
 ```bash
-brew tap fmueller/tap
+brew tap fmueller/homebrew-tap
 brew install --cask voxclip
 ```
 
